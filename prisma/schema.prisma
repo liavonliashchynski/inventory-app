@@ -6,9 +6,101 @@ datasource db {
   provider = "postgresql"
 }
 
+model Company {
+  id        String   @id @default(uuid())
+  name      String
+  createdAt DateTime @default(now())
+
+  users     User[]
+  products  Product[]
+  offers    Offer[]
+
+  @@index([name])
+}
+
 model User {
   id        String   @id @default(uuid())
   email     String   @unique
+  password  String
   name      String?
+  role      Role     @default(EMPLOYEE)
+
+  companyId String
+  company   Company  @relation(fields: [companyId], references: [id])
+
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([companyId])
+}
+
+model Product {
+  id        String   @id @default(uuid())
+  name      String
+  price     Decimal  @db.Decimal(10,2)
+  currency  Currency @default(USD)
+
+  companyId String
+  company   Company  @relation(fields: [companyId], references: [id])
+
+  offerItems OfferItem[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([companyId])
+}
+
+model Offer {
+  id        String   @id @default(uuid())
+
+  companyId String
+  company   Company  @relation(fields: [companyId], references: [id])
+
+  items     OfferItem[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  status    OfferStatus @default(DRAFT)
+
+  @@index([companyId])
+}
+
+model OfferItem {
+  id        String   @id @default(uuid())
+
+  offerId   String
+  offer     Offer    @relation(fields: [offerId], references: [id])
+
+  productId String
+  product   Product  @relation(fields: [productId], references: [id])
+
+  quantity  Int
+  price     Decimal  @db.Decimal(10,2)
+
+  createdAt DateTime @default(now())
+  
+  @@index([offerId])
+  @@index([productId])
+  @@unique([offerId, productId])
+}
+
+enum OfferStatus {
+DRAFT
+SENT
+ACCEPTED
+REJECTED
+}
+
+enum Role {
+  ADMIN
+  MANAGER
+  EMPLOYEE
+}
+
+enum Currency {
+  USD
+  EUR
+  PLN
 }
