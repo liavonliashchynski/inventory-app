@@ -1,8 +1,15 @@
 import { db } from "@/lib/db";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
+  const jwtSecret = process.env.JWT_SECRET;
+
+  if (!jwtSecret) {
+    return new Response("Server auth misconfigured", { status: 500 });
+  }
+
   const { email, password } = await req.json();
 
   const user = await db.user.findUnique({
@@ -25,13 +32,18 @@ export async function POST(req: Request) {
       companyId: user.companyId,
       role: user.role,
     },
-    process.env.JWT_SECRET!,
+    jwtSecret,
     { expiresIn: "7d" },
   );
 
-  return new Response(JSON.stringify({ success: true }), {
-    headers: {
-      "Set-Cookie": `token=${token}; HttpOnly; Path=/; Max-Age=604800`,
-    },
+  const res = NextResponse.json({ success: true });
+  res.cookies.set("token", token, {
+    httpOnly: true,
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production",
+    path: "/",
+    maxAge: 60 * 60 * 24 * 7,
   });
+
+  return res;
 }
