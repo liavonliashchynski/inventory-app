@@ -8,74 +8,49 @@ const schema = z.object({
   companyName: z.string().min(2),
 });
 
-function generateSlug(name: string) {
-  return name
+const generateSlug = (name: string) =>
+  name
     .toLowerCase()
     .trim()
     .replace(/\s+/g, "-")
     .replace(/[^\w-]+/g, "");
-}
 
 export async function POST(req: Request) {
   try {
-    const body = await req.json();
-    const data = schema.parse(body);
+    const data = schema.parse(await req.json());
 
-    const existingUser = await db.user.findUnique({
-      where: { email: data.email },
-    });
-
-    if (existingUser) {
+    if (await db.user.findUnique({ where: { email: data.email } })) {
       return Response.json({ error: "User already exists" }, { status: 400 });
+    }
+
+    const baseSlug = generateSlug(data.companyName);
+    let slug = baseSlug;
+    let counter = 1;
+
+    // Condense the slug uniqueness check
+    while (await db.company.findUnique({ where: { slug } })) {
+      slug = `${baseSlug}-${counter++}`;
     }
 
     const hashedPassword = await bcrypt.hash(data.password, 10);
 
-    let slug = generateSlug(data.companyName);
-
-    // check if slug already exists
-    let existingSlug = await db.company.findUnique({
-      where: { slug },
-    });
-
-    let counter = 1;
-
-    while (existingSlug) {
-      slug = `${generateSlug(data.companyName)}-${counter}`;
-      existingSlug = await db.company.findUnique({
-        where: { slug },
-      });
-      counter++;
-    }
-
-    const company = await db.company.create({
-      data: {
-        name: data.companyName,
-        slug: slug,
-      },
-    });
-
+    // Combine Company and User creation using Prisma nested writes
     const user = await db.user.create({
       data: {
         email: data.email,
         password: hashedPassword,
-        companyId: company.id,
         role: "ADMIN",
+        company: {
+          create: { name: data.companyName, slug },
+        },
       },
-      select: {
-        id: true,
-        email: true,
-        role: true,
-        companyId: true,
-      },
+      select: { id: true, email: true, role: true, companyId: true },
     });
 
     return Response.json(user, { status: 201 });
   } catch (error) {
-    if (error instanceof z.ZodError) {
+    if (error instanceof z.ZodError)
       return Response.json({ error: error.issues }, { status: 400 });
-    }
-
     return Response.json({ error: "Internal server error" }, { status: 500 });
   }
 }
