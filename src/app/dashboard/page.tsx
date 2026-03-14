@@ -1,9 +1,49 @@
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
+import { jwtVerify } from "jose";
+import { db } from "@/lib/db";
 import { getDashboardStats } from "@/services/dashboard";
 
-const CURRENT_COMPANY_ID = "some-company-uuid";
-
 export default async function DashboardPage() {
-  const stats = await getDashboardStats(CURRENT_COMPANY_ID);
+  const cookieStore = await cookies();
+  const token = cookieStore.get("token")?.value;
+
+  if (!token) {
+    redirect("/login");
+  }
+
+  let userId: string | null = null;
+
+  try {
+    const secret = process.env.JWT_SECRET;
+    if (!secret) {
+      redirect("/login");
+    }
+
+    const { payload } = await jwtVerify(
+      token,
+      new TextEncoder().encode(secret),
+    );
+
+    userId = (payload.id || payload.userId || payload.sub) as string;
+  } catch (error) {
+    redirect("/login");
+  }
+
+  if (!userId) {
+    redirect("/login");
+  }
+
+  const user = await db.user.findUnique({
+    where: { id: userId },
+    select: { companyId: true },
+  });
+
+  if (!user) {
+    redirect("/login");
+  }
+
+  const stats = await getDashboardStats(user.companyId);
 
   return (
     <div className="p-8">
