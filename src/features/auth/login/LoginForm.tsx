@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import styles from "./login.module.scss";
 import { useLogin } from "./useLogin";
 
@@ -38,6 +39,10 @@ export default function LoginForm() {
         <button type="submit" disabled={isLoading}>
           {isLoading ? "Signing in..." : "Login"}
         </button>
+
+        <Link href="/register" className={styles.secondaryAction}>
+          Create an account
+        </Link>
       </form>
     </div>
   );
