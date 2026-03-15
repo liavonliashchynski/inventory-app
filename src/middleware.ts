@@ -1,27 +1,29 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { jwtVerify } from "jose";
 
-const PUBLIC_ROUTES = ["/login", "/register", "/api/auth"];
+const secret = new TextEncoder().encode(process.env.JWT_SECRET);
 
 export async function middleware(req: NextRequest) {
-  if (PUBLIC_ROUTES.some((route) => req.nextUrl.pathname.startsWith(route))) {
-    return NextResponse.next();
-  }
-
+  const path = req.nextUrl.pathname;
   const token = req.cookies.get("token")?.value;
-  const secret = process.env.JWT_SECRET;
 
-  try {
-    if (!token || !secret) throw new Error("Missing credentials");
+  const isValid =
+    token &&
+    (await jwtVerify(token, secret)
+      .then(() => true)
+      .catch(() => false));
+  const isAuth = ["/login", "/register"].includes(path);
 
-    // Verifies signature and expiration (exp) automatically
-    await jwtVerify(token, new TextEncoder().encode(secret));
-    return NextResponse.next();
-  } catch {
+  if (isValid && isAuth)
+    return NextResponse.redirect(new URL("/dashboard", req.url));
+
+  if (!isValid && !isAuth && !path.startsWith("/api/auth")) {
     const res = NextResponse.redirect(new URL("/login", req.url));
     res.cookies.delete("token");
     return res;
   }
+
+  return NextResponse.next();
 }
 
 export const config = {
