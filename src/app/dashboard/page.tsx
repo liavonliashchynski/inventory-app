@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { jwtVerify } from "jose";
 import { db } from "@/lib/db";
 import { getDashboardStats } from "@/services/dashboard";
+import SignOutButton from "@/features/auth/sign-out-button/SignOutButton";
 
 export default async function DashboardPage() {
   const cookieStore = await cookies();
@@ -69,6 +70,7 @@ export default async function DashboardPage() {
             {stats.wonOffers}
           </p>
         </div>
+        <SignOutButton />
       </div>
     </div>
   );
