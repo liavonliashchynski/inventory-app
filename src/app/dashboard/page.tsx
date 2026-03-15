@@ -4,6 +4,7 @@ import { jwtVerify } from "jose";
 import { db } from "@/lib/db";
 import { getDashboardStats } from "@/services/dashboard";
 import SignOutButton from "@/features/auth/sign-out-button/SignOutButton";
+import AddProductForm from "@/features/products/add-product/AddProductForm";
 
 export default async function DashboardPage() {
   const cookieStore = await cookies();
@@ -48,7 +49,18 @@ export default async function DashboardPage() {
 
   return (
     <div className="p-8">
-      <h1 className="text-2xl font-bold mb-6">Inventory & Sales Dashboard</h1>
+      <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+        <div>
+          <h1 className="text-2xl font-bold">Inventory & Sales Dashboard</h1>
+          <p className="mt-1 text-sm text-gray-500">
+            Track products, quotes, and won deals in one place.
+          </p>
+        </div>
+        <SignOutButton />
+      </div>
+
+      <AddProductForm companyId={user.companyId} />
+
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="p-6 bg-white rounded-lg shadow border border-gray-200">
           <h3 className="text-gray-500 text-sm font-medium">Total Products</h3>
@@ -70,7 +82,6 @@ export default async function DashboardPage() {
             {stats.wonOffers}
           </p>
         </div>
-        <SignOutButton />
       </div>
     </div>
   );
