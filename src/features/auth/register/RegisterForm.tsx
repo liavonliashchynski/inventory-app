@@ -2,6 +2,7 @@
 
 import styles from "./register.module.scss";
 import { useRegister } from "./useRegister";
+import Link from "next/link";
 
 export default function RegisterForm() {
   const { isLoading, error, handleRegister } = useRegister();
@@ -29,6 +30,10 @@ export default function RegisterForm() {
         <button type="submit" disabled={isLoading}>
           {isLoading ? "Signing up..." : "Register"}
         </button>
+        <p className={styles.helperText}>Already have an account?</p>
+        <Link href="/login" className={styles.secondaryAction}>
+          Sign in
+        </Link>
       </form>
     </div>
   );
