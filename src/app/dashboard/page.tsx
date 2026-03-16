@@ -5,6 +5,7 @@ import { db } from "@/lib/db";
 import { getDashboardStats } from "@/services/dashboard";
 import SignOutButton from "@/features/auth/sign-out-button/SignOutButton";
 import AddProductForm from "@/features/products/add-product/AddProductForm";
+import ProductList from "@/features/products/product-list/ProductList";
 
 export default async function DashboardPage() {
   const cookieStore = await cookies();
@@ -46,6 +47,17 @@ export default async function DashboardPage() {
   }
 
   const stats = await getDashboardStats(user.companyId);
+  const products = await db.product.findMany({
+    where: { companyId: user.companyId },
+    orderBy: { createdAt: "desc" },
+    select: {
+      id: true,
+      name: true,
+      price: true,
+      currency: true,
+      createdAt: true,
+    },
+  });
 
   return (
     <div className="p-8">
@@ -83,6 +95,13 @@ export default async function DashboardPage() {
           </p>
         </div>
       </div>
+
+      <ProductList
+        products={products.map((product) => ({
+          ...product,
+          price: product.price.toString(),
+        }))}
+      />
     </div>
   );
 }
