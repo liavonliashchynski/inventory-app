@@ -30,7 +30,9 @@ export default function RegisterForm() {
         <button type="submit" disabled={isLoading}>
           {isLoading ? "Signing up..." : "Register"}
         </button>
-        <p className={styles.helperText}>Already have an account?</p>
+        <p className={styles.helperText}>
+          We&apos;ll send a verification link before you can sign in.
+        </p>
         <Link href="/login" className={styles.secondaryAction}>
           Sign in
         </Link>

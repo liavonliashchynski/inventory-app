@@ -25,6 +25,9 @@ model User {
   password  String
   name      String?
   role      Role     @default(EMPLOYEE)
+  emailVerifiedAt            DateTime?
+  emailVerificationToken     String?   @unique
+  emailVerificationExpiresAt DateTime?
 
   companyId String
   company   Company  @relation(fields: [companyId], references: [id])

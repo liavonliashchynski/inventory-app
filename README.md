@@ -24,6 +24,7 @@ The project focuses on clean database design, business logic and scalable archit
 - Snapshot pricing for historical consistency
 - Relational database design with PostgreSQL
 - REST API with Next.js
+- Email verification via Brevo SMTP
 
 ## Architecture
 

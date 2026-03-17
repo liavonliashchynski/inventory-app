@@ -35,7 +35,17 @@ export function useRegister() {
         return;
       }
 
-      window.location.assign("/login");
+      const email =
+        typeof formValues.email === "string"
+          ? encodeURIComponent(formValues.email)
+          : "";
+      const verificationState = resData.verificationEmailQueued
+        ? "pending"
+        : "needs-resend";
+
+      window.location.assign(
+        `/login?verification=${verificationState}&email=${email}`,
+      );
     } catch {
       setError("Network error. Try again.");
     } finally {

@@ -11,9 +11,10 @@ export async function POST(req: Request) {
   }
 
   const { email, password } = await req.json();
+  const normalizedEmail = typeof email === "string" ? email.trim().toLowerCase() : "";
 
   const user = await db.user.findUnique({
-    where: { email },
+    where: { email: normalizedEmail },
   });
 
   if (!user) {
@@ -24,6 +25,13 @@ export async function POST(req: Request) {
 
   if (!valid) {
     return new Response("Invalid credentials", { status: 401 });
+  }
+
+  if (!user.emailVerifiedAt) {
+    return new Response(
+      "Please verify your email before signing in.",
+      { status: 403 },
+    );
   }
 
   const token = jwt.sign(
