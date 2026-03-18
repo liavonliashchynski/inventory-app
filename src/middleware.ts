@@ -1,23 +1,27 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { jwtVerify } from "jose";
 
-const secret = new TextEncoder().encode(process.env.JWT_SECRET);
+const PUBLIC_ROUTES = new Set(["/", "/login", "/register"]);
 
 export async function middleware(req: NextRequest) {
   const path = req.nextUrl.pathname;
   const token = req.cookies.get("token")?.value;
+  const secret = process.env.JWT_SECRET;
+  const isPublicRoute = PUBLIC_ROUTES.has(path);
 
-  const isValid =
-    token &&
-    (await jwtVerify(token, secret)
+  let isValid = false;
+
+  if (token && secret) {
+    isValid = await jwtVerify(token, new TextEncoder().encode(secret))
       .then(() => true)
-      .catch(() => false));
-  const isAuth = ["/login", "/register"].includes(path);
+      .catch(() => false);
+  }
 
-  if (isValid && isAuth)
+  if (isValid && isPublicRoute) {
     return NextResponse.redirect(new URL("/dashboard", req.url));
+  }
 
-  if (!isValid && !isAuth && !path.startsWith("/api/auth")) {
+  if (!isValid && !isPublicRoute && !path.startsWith("/api/auth")) {
     const res = NextResponse.redirect(new URL("/login", req.url));
     res.cookies.delete("token");
     return res;
