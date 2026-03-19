@@ -216,6 +216,16 @@ export default function OfferList({ offers }: { offers: Offer[] }) {
                           Open page
                         </Link>
                       ) : null}
+                      {offer.publicToken ? (
+                        <Link
+                          href={`/offers/${offer.publicToken}?print=1`}
+                          className={s.linkAction}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          Export PDF
+                        </Link>
+                      ) : null}
                       {offer.responseNote ? (
                         <small className={s.helperText}>{offer.responseNote}</small>
                       ) : null}

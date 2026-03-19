@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
 import OfferResponseForm from "./OfferResponseForm";
+import PrintActions from "./PrintActions";
 
 const currencyFormatters: Record<string, Intl.NumberFormat> = {};
 
@@ -40,10 +41,14 @@ function getStatusClasses(
 
 export default async function PublicOfferPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ token: string }>;
+  searchParams?: Promise<{ print?: string }>;
 }) {
   const { token } = await params;
+  const resolvedSearchParams = searchParams ? await searchParams : undefined;
+  const printMode = resolvedSearchParams?.print === "1";
 
   const initialOffer = await db.offer.findFirst({
     where: { publicToken: token },
@@ -135,25 +140,45 @@ export default async function PublicOfferPage({
   );
   const currency = offer.items[0]?.currency;
   return (
-    <main className="min-h-screen bg-slate-100 px-4 py-10 text-slate-900">
-      <div className="mx-auto max-w-4xl rounded-3xl border border-slate-200 bg-white shadow-xl shadow-slate-200/60">
-        <section className="border-b border-slate-200 bg-[linear-gradient(135deg,#0f766e,#115e59)] px-8 py-10 text-white">
+    <main
+      className={`min-h-screen px-4 py-10 text-slate-900 ${
+        printMode ? "bg-white print:p-0" : "bg-slate-100"
+      }`}
+    >
+      <div
+        className={`mx-auto max-w-4xl bg-white ${
+          printMode
+            ? "rounded-none border-0 shadow-none"
+            : "rounded-3xl border border-slate-200 shadow-xl shadow-slate-200/60"
+        }`}
+      >
+        <section
+          className={`border-b px-8 py-10 ${
+            printMode
+              ? "border-slate-200 bg-white text-slate-900"
+              : "border-slate-200 bg-[linear-gradient(135deg,#0f766e,#115e59)] text-white"
+          }`}
+        >
           <div className="flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
             <div className="space-y-3">
-              <p className="text-sm uppercase tracking-[0.24em] text-teal-100">
+              <p
+                className={`text-sm uppercase tracking-[0.24em] ${
+                  printMode ? "text-slate-500" : "text-teal-100"
+                }`}
+              >
                 Offer from {offer.company.name}
               </p>
               <div>
                 <h1 className="text-3xl font-semibold tracking-tight">
                   {offer.offerNumber || "Offer"}
                 </h1>
-                <p className="mt-2 text-teal-50">
+                <p className={`mt-2 ${printMode ? "text-slate-600" : "text-teal-50"}`}>
                   Prepared for {offer.clientName || "your team"}.
                 </p>
               </div>
             </div>
 
-            <div className="space-y-3 text-sm text-teal-50">
+            <div className={`space-y-3 text-sm ${printMode ? "text-slate-600" : "text-teal-50"}`}>
               <span
                 className={`inline-flex rounded-full px-3 py-1 text-xs font-semibold tracking-[0.18em] ${getStatusClasses(
                   offer.status,
@@ -171,10 +196,18 @@ export default async function PublicOfferPage({
               </p>
             </div>
           </div>
+
+          <div className="mt-6">
+            <PrintActions autoPrint={printMode} />
+          </div>
         </section>
 
         <section className="px-8 py-8">
-          <div className="grid gap-6 md:grid-cols-[minmax(0,1fr)_240px]">
+          <div
+            className={`grid gap-6 ${
+              printMode ? "md:grid-cols-[minmax(0,1fr)_220px]" : "md:grid-cols-[minmax(0,1fr)_240px]"
+            }`}
+          >
             <div className="overflow-hidden rounded-2xl border border-slate-200">
               <table className="w-full border-collapse">
                 <thead className="bg-slate-50 text-left text-sm uppercase tracking-[0.16em] text-slate-500">
@@ -210,11 +243,13 @@ export default async function PublicOfferPage({
             </div>
 
             <aside className="space-y-4">
-              <OfferResponseForm
-                token={offer.publicToken!}
-                currentStatus={offer.status}
-                isClosed={offer.status === "ACCEPTED" || offer.status === "REJECTED"}
-              />
+              {!printMode ? (
+                <OfferResponseForm
+                  token={offer.publicToken!}
+                  currentStatus={offer.status}
+                  isClosed={offer.status === "ACCEPTED" || offer.status === "REJECTED"}
+                />
+              ) : null}
 
               <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
                 <div>
