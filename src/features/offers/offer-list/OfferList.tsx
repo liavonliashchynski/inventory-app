@@ -13,12 +13,14 @@ type OfferItem = {
 type Offer = {
   id: string;
   offerNumber: string | null;
-  status: "DRAFT" | "SENT" | "ACCEPTED" | "REJECTED";
+  status: "DRAFT" | "SENT" | "SEEN" | "ACCEPTED" | "REJECTED";
   clientName: string | null;
   clientEmail: string | null;
   publicToken: string | null;
   createdAt: Date;
   validUntil: Date | null;
+  sentAt: Date | null;
+  seenAt: Date | null;
   items: OfferItem[];
 };
 
@@ -99,6 +101,15 @@ export default function OfferList({ offers }: { offers: Offer[] }) {
                     <span className={`${s.badge} ${s[offer.status.toLowerCase()]}`}>
                       {offer.status}
                     </span>
+                    {offer.seenAt ? (
+                      <div className={s.metaText}>
+                        Seen {offer.seenAt.toLocaleDateString()}
+                      </div>
+                    ) : offer.sentAt ? (
+                      <div className={s.metaText}>
+                        Sent {offer.sentAt.toLocaleDateString()}
+                      </div>
+                    ) : null}
                   </td>
                   <td>{getOfferTotal(offer.items)}</td>
                   <td>

@@ -89,6 +89,7 @@ model Offer {
   notes      String?
   validUntil DateTime?
   sentAt     DateTime?
+  seenAt     DateTime?
 
   items     OfferItem[]
 
@@ -125,6 +126,7 @@ model OfferItem {
 enum OfferStatus {
 DRAFT
 SENT
+SEEN
 ACCEPTED
 REJECTED
 }

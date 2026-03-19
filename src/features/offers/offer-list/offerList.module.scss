@@ -141,6 +141,12 @@
   line-height: 1.4;
 }
 
+.metaText {
+  margin-top: 0.4rem;
+  color: #6b7280;
+  font-size: 0.78rem;
+}
+
 .badge {
   display: inline-flex;
   align-items: center;
@@ -161,6 +167,11 @@
 .sent {
   color: #1d4ed8;
   background: #dbeafe;
+}
+
+.seen {
+  color: #155e75;
+  background: #cffafe;
 }
 
 .accepted {

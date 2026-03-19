@@ -20,12 +20,16 @@ function formatDate(value: Date) {
   }).format(value);
 }
 
-function getStatusClasses(status: "DRAFT" | "SENT" | "ACCEPTED" | "REJECTED") {
+function getStatusClasses(
+  status: "DRAFT" | "SENT" | "SEEN" | "ACCEPTED" | "REJECTED",
+) {
   switch (status) {
     case "ACCEPTED":
       return "bg-emerald-100 text-emerald-800";
     case "REJECTED":
       return "bg-rose-100 text-rose-800";
+    case "SEEN":
+      return "bg-cyan-100 text-cyan-800";
     case "SENT":
       return "bg-sky-100 text-sky-800";
     default:
@@ -40,9 +44,10 @@ export default async function PublicOfferPage({
 }) {
   const { token } = await params;
 
-  const offer = await db.offer.findFirst({
+  const initialOffer = await db.offer.findFirst({
     where: { publicToken: token },
     select: {
+      id: true,
       offerNumber: true,
       clientName: true,
       status: true,
@@ -50,6 +55,7 @@ export default async function PublicOfferPage({
       notes: true,
       createdAt: true,
       sentAt: true,
+      seenAt: true,
       items: {
         select: {
           id: true,
@@ -68,9 +74,49 @@ export default async function PublicOfferPage({
     },
   });
 
-  if (!offer) {
+  if (!initialOffer) {
     notFound();
   }
+
+  const shouldMarkSeen =
+    !initialOffer.seenAt &&
+    (initialOffer.status === "SENT" || initialOffer.status === "SEEN");
+
+  const offer = shouldMarkSeen
+    ? await db.offer.update({
+        where: { id: initialOffer.id },
+        data: {
+          seenAt: new Date(),
+          status: initialOffer.status === "SENT" ? "SEEN" : "SEEN",
+        },
+        select: {
+          id: true,
+          offerNumber: true,
+          clientName: true,
+          status: true,
+          validUntil: true,
+          notes: true,
+          createdAt: true,
+          sentAt: true,
+          seenAt: true,
+          items: {
+            select: {
+              id: true,
+              productName: true,
+              quantity: true,
+              price: true,
+              currency: true,
+            },
+            orderBy: { createdAt: "asc" },
+          },
+          company: {
+            select: {
+              name: true,
+            },
+          },
+        },
+      })
+    : initialOffer;
 
   const total = offer.items.reduce(
     (sum, item) => sum + Number(item.price) * item.quantity,
@@ -106,6 +152,7 @@ export default async function PublicOfferPage({
               </span>
               <p>Created {formatDate(offer.createdAt)}</p>
               <p>{offer.sentAt ? `Sent ${formatDate(offer.sentAt)}` : "Not sent yet"}</p>
+              <p>{offer.seenAt ? `Seen ${formatDate(offer.seenAt)}` : "Not viewed yet"}</p>
               <p>
                 {offer.validUntil
                   ? `Valid until ${formatDate(offer.validUntil)}`

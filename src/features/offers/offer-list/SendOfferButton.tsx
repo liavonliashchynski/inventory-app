@@ -10,7 +10,7 @@ export default function SendOfferButton({
   clientEmail,
 }: {
   offerId: string;
-  status: "DRAFT" | "SENT" | "ACCEPTED" | "REJECTED";
+  status: "DRAFT" | "SENT" | "SEEN" | "ACCEPTED" | "REJECTED";
   clientEmail: string | null;
 }) {
   const router = useRouter();
@@ -19,7 +19,8 @@ export default function SendOfferButton({
 
   const isClosed = status === "ACCEPTED" || status === "REJECTED";
   const isDisabled = !clientEmail || isClosed || isPending;
-  const buttonLabel = isPending ? "Sending..." : status === "SENT" ? "Resend" : "Send";
+  const buttonLabel =
+    isPending ? "Sending..." : status === "SENT" || status === "SEEN" ? "Resend" : "Send";
 
   async function handleSend() {
     setMessage(null);

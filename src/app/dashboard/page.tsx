@@ -51,18 +51,20 @@ export default async function DashboardPage() {
       where: { companyId: user.companyId },
       orderBy: { createdAt: "desc" },
       take: 10,
-      select: {
-        id: true,
-        offerNumber: true,
-        status: true,
-        clientName: true,
-        clientEmail: true,
-        publicToken: true,
-        createdAt: true,
-        validUntil: true,
-        items: {
-          select: {
-            id: true,
+        select: {
+          id: true,
+          offerNumber: true,
+          status: true,
+          clientName: true,
+          clientEmail: true,
+          publicToken: true,
+          createdAt: true,
+          validUntil: true,
+          sentAt: true,
+          seenAt: true,
+          items: {
+            select: {
+              id: true,
             productName: true,
             quantity: true,
             price: true,
