@@ -3,7 +3,7 @@ import { jwtVerify } from "jose";
 
 const PUBLIC_ROUTES = new Set(["/", "/login", "/register"]);
 
-export async function middleware(req: NextRequest) {
+export async function proxy(req: NextRequest) {
   const path = req.nextUrl.pathname;
   const token = req.cookies.get("token")?.value;
   const secret = process.env.JWT_SECRET;
