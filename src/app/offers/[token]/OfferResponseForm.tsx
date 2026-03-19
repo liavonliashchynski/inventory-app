@@ -17,6 +17,7 @@ export default function OfferResponseForm({
   const [isPending, startTransition] = useTransition();
 
   const closed = isClosed || status === "ACCEPTED" || status === "REJECTED";
+  const hasResponded = status === "ACCEPTED" || status === "REJECTED";
 
   async function submitResponse(response: "ACCEPTED" | "REJECTED") {
     setMessage(null);
@@ -53,7 +54,32 @@ export default function OfferResponseForm({
         Respond
       </p>
 
-      {closed ? (
+      {hasResponded ? (
+        <div
+          className={`mt-4 rounded-2xl border p-5 ${
+            status === "ACCEPTED"
+              ? "border-emerald-200 bg-emerald-50"
+              : "border-rose-200 bg-rose-50"
+          }`}
+        >
+          <p
+            className={`text-xs font-semibold uppercase tracking-[0.18em] ${
+              status === "ACCEPTED" ? "text-emerald-700" : "text-rose-700"
+            }`}
+          >
+            Response saved
+          </p>
+          <h2 className="mt-2 text-xl font-semibold text-slate-900">
+            {status === "ACCEPTED" ? "Thank you for accepting the offer." : "Thank you for your response."}
+          </h2>
+          <p className="mt-2 text-sm text-slate-600">
+            {status === "ACCEPTED"
+              ? "The company has been notified that you approved this offer."
+              : "The company has been notified that you rejected this offer."}
+          </p>
+          {message ? <p className="mt-3 text-sm text-slate-600">{message}</p> : null}
+        </div>
+      ) : closed ? (
         <p className="mt-3 text-sm text-slate-600">
           This offer has already been marked as {status.toLowerCase()}.
         </p>
@@ -97,7 +123,7 @@ export default function OfferResponseForm({
         </>
       )}
 
-      {message ? <p className="mt-4 text-sm text-slate-600">{message}</p> : null}
+      {!hasResponded && message ? <p className="mt-4 text-sm text-slate-600">{message}</p> : null}
     </section>
   );
 }

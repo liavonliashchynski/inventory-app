@@ -207,7 +207,7 @@ export default async function PublicOfferPage({
                   ))}
                 </tbody>
               </table>
-          </div>
+            </div>
 
             <aside className="space-y-4">
               <OfferResponseForm
@@ -217,47 +217,47 @@ export default async function PublicOfferPage({
               />
 
               <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
-              <div>
-                <p className="text-sm uppercase tracking-[0.18em] text-slate-500">
-                  Summary
-                </p>
-                <p className="mt-2 text-3xl font-semibold text-slate-900">
-                  {currency ? formatMoney(total, currency) : "-"}
-                </p>
-                <p className="mt-1 text-sm text-slate-500">
-                  {offer.items.length} line item{offer.items.length === 1 ? "" : "s"}
-                </p>
-              </div>
-
-              {offer.acceptedAt ? (
-                <p className="text-sm text-emerald-700">
-                  Accepted {formatDate(offer.acceptedAt)}
-                </p>
-              ) : null}
-
-              {offer.rejectedAt ? (
-                <p className="text-sm text-rose-700">
-                  Rejected {formatDate(offer.rejectedAt)}
-                </p>
-              ) : null}
-
-              {offer.responseNote ? (
-                <div className="rounded-xl border border-slate-200 bg-white p-4">
-                  <p className="text-sm font-semibold text-slate-900">Response note</p>
-                  <p className="mt-2 whitespace-pre-wrap text-sm text-slate-600">
-                    {offer.responseNote}
+                <div>
+                  <p className="text-sm uppercase tracking-[0.18em] text-slate-500">
+                    Summary
+                  </p>
+                  <p className="mt-2 text-3xl font-semibold text-slate-900">
+                    {currency ? formatMoney(total, currency) : "-"}
+                  </p>
+                  <p className="mt-1 text-sm text-slate-500">
+                    {offer.items.length} line item{offer.items.length === 1 ? "" : "s"}
                   </p>
                 </div>
-              ) : null}
 
-              {offer.notes ? (
-                <div className="rounded-xl border border-slate-200 bg-white p-4">
-                  <p className="text-sm font-semibold text-slate-900">Notes</p>
-                  <p className="mt-2 whitespace-pre-wrap text-sm text-slate-600">
-                    {offer.notes}
+                {offer.acceptedAt ? (
+                  <p className="text-sm text-emerald-700">
+                    Accepted {formatDate(offer.acceptedAt)}
                   </p>
-                </div>
-              ) : null}
+                ) : null}
+
+                {offer.rejectedAt ? (
+                  <p className="text-sm text-rose-700">
+                    Rejected {formatDate(offer.rejectedAt)}
+                  </p>
+                ) : null}
+
+                {offer.responseNote ? (
+                  <div className="rounded-xl border border-slate-200 bg-white p-4">
+                    <p className="text-sm font-semibold text-slate-900">Response note</p>
+                    <p className="mt-2 whitespace-pre-wrap text-sm text-slate-600">
+                      {offer.responseNote}
+                    </p>
+                  </div>
+                ) : null}
+
+                {offer.notes ? (
+                  <div className="rounded-xl border border-slate-200 bg-white p-4">
+                    <p className="text-sm font-semibold text-slate-900">Notes</p>
+                    <p className="mt-2 whitespace-pre-wrap text-sm text-slate-600">
+                      {offer.notes}
+                    </p>
+                  </div>
+                ) : null}
               </div>
             </aside>
           </div>
