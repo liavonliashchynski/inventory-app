@@ -54,6 +54,13 @@ export async function POST(request: Request) {
       );
     }
 
+    if (offer.status !== "SENT" && offer.status !== "SEEN") {
+      return NextResponse.json(
+        { error: "This offer is not open for response yet." },
+        { status: 409 },
+      );
+    }
+
     const now = new Date();
 
     await db.offer.update({

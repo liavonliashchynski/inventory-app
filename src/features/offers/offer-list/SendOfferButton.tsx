@@ -21,6 +21,11 @@ export default function SendOfferButton({
   const isDisabled = !clientEmail || isClosed || isPending;
   const buttonLabel =
     isPending ? "Sending..." : status === "SENT" || status === "SEEN" ? "Resend" : "Send";
+  const helperMessage = !clientEmail
+    ? "Add a client email before sending."
+    : isClosed
+      ? "Locked after final response."
+      : message;
 
   async function handleSend() {
     setMessage(null);
@@ -55,7 +60,7 @@ export default function SendOfferButton({
       >
         {clientEmail ? (isClosed ? "Closed" : buttonLabel) : "No email"}
       </button>
-      {message ? <small className={s.helperText}>{message}</small> : null}
+      {helperMessage ? <small className={s.helperText}>{helperMessage}</small> : null}
     </div>
   );
 }

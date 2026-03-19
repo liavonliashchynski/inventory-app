@@ -18,6 +18,7 @@ export default function OfferResponseForm({
 
   const closed = isClosed || status === "ACCEPTED" || status === "REJECTED";
   const hasResponded = status === "ACCEPTED" || status === "REJECTED";
+  const isOpenForResponse = status === "SENT" || status === "SEEN";
 
   async function submitResponse(response: "ACCEPTED" | "REJECTED") {
     setMessage(null);
@@ -83,6 +84,15 @@ export default function OfferResponseForm({
         <p className="mt-3 text-sm text-slate-600">
           This offer has already been marked as {status.toLowerCase()}.
         </p>
+      ) : !isOpenForResponse ? (
+        <div className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 p-5">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-amber-700">
+            Response unavailable
+          </p>
+          <p className="mt-2 text-sm text-slate-700">
+            This offer is not open for acceptance yet. Please use the latest emailed link after the company sends it.
+          </p>
+        </div>
       ) : (
         <>
           <p className="mt-3 text-sm text-slate-600">
