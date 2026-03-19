@@ -4,7 +4,7 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import styles from "./addProductForm.module.scss";
 
-export default function AddProductForm({ companyId }: { companyId: string }) {
+export default function AddProductForm() {
   const router = useRouter();
   const [msg, setMsg] = useState("");
   const [isPending, startTransition] = useTransition();
@@ -18,7 +18,7 @@ export default function AddProductForm({ companyId }: { companyId: string }) {
       const res = await fetch("/api/products", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...data, companyId }),
+        body: JSON.stringify(data),
       });
 
       if (!res.ok)
@@ -27,8 +27,10 @@ export default function AddProductForm({ companyId }: { companyId: string }) {
       form.reset();
       setMsg("Product added.");
       startTransition(() => router.refresh());
-    } catch (err: any) {
-      setMsg(err.message || "Network error. Try again.");
+    } catch (error) {
+      setMsg(
+        error instanceof Error ? error.message : "Network error. Try again.",
+      );
     }
   }
 

@@ -1,21 +1,28 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { revalidatePath } from "next/cache";
+import { z } from "zod";
+import { getSessionUser } from "@/lib/auth";
 
-export async function GET(request: Request) {
+const productSchema = z.object({
+  name: z.string().trim().min(2).max(120),
+  price: z.coerce.number().positive(),
+  currency: z.enum(["USD", "EUR", "PLN"]).default("USD"),
+});
+
+export async function GET() {
   try {
-    const { searchParams } = new URL(request.url);
-    const companyId = searchParams.get("companyId");
+    const session = await getSessionUser();
 
-    if (!companyId) {
+    if (!session) {
       return NextResponse.json(
-        { error: "Missing companyId parameter" },
-        { status: 400 },
+        { error: "Unauthorized" },
+        { status: 401 },
       );
     }
 
     const products = await db.product.findMany({
-      where: { companyId },
+      where: { companyId: session.companyId },
       orderBy: { createdAt: "desc" },
     });
 
@@ -31,22 +38,31 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
-    const { name, price, companyId, currency } = body;
+    const session = await getSessionUser();
 
-    if (!name || !price || !companyId) {
+    if (!session) {
       return NextResponse.json(
-        { error: "Name, price, and companyId are required" },
+        { error: "Unauthorized" },
+        { status: 401 },
+      );
+    }
+
+    const body = await request.json();
+    const parsed = productSchema.safeParse(body);
+
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: parsed.error.issues[0]?.message || "Invalid product payload" },
         { status: 400 },
       );
     }
 
     const newProduct = await db.product.create({
       data: {
-        name,
-        price: parseFloat(price),
-        currency: currency || "USD",
-        companyId,
+        name: parsed.data.name,
+        price: parsed.data.price,
+        currency: parsed.data.currency,
+        companyId: session.companyId,
       },
     });
     revalidatePath("/dashboard");

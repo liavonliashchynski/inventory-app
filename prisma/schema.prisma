@@ -14,6 +14,7 @@ model Company {
 
   users     User[]
   products  Product[]
+  clients   Client[]
   offers    Offer[]
 
   @@index([name])
@@ -55,11 +56,38 @@ model Product {
   @@index([companyId])
 }
 
+model Client {
+  id        String   @id @default(uuid())
+  name      String
+  email     String?
+  phone     String?
+
+  companyId String
+  company   Company  @relation(fields: [companyId], references: [id])
+
+  offers    Offer[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([companyId])
+  @@index([name])
+}
+
 model Offer {
   id        String   @id @default(uuid())
 
   companyId String
   company   Company  @relation(fields: [companyId], references: [id])
+
+  clientId   String?
+  client     Client?  @relation(fields: [clientId], references: [id])
+  clientName String?
+  clientEmail String?
+  offerNumber String?
+  notes      String?
+  validUntil DateTime?
+  sentAt     DateTime?
 
   items     OfferItem[]
 
@@ -69,6 +97,7 @@ model Offer {
   status    OfferStatus @default(DRAFT)
 
   @@index([companyId])
+  @@index([clientId])
 }
 
 model OfferItem {
@@ -80,8 +109,10 @@ model OfferItem {
   productId String
   product   Product  @relation(fields: [productId], references: [id])
 
+  productName String
   quantity  Int
   price     Decimal  @db.Decimal(10,2)
+  currency  Currency
 
   createdAt DateTime @default(now())
   
