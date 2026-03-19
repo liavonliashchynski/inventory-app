@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { useMemo, useState } from "react";
 import s from "./offerList.module.scss";
 import SendOfferButton from "./SendOfferButton";
 
@@ -25,6 +28,25 @@ type Offer = {
   rejectedAt: Date | null;
   responseNote: string | null;
   items: OfferItem[];
+};
+
+type OfferStatus = Offer["status"];
+
+const statusOrder: OfferStatus[] = [
+  "DRAFT",
+  "SENT",
+  "SEEN",
+  "ACCEPTED",
+  "REJECTED",
+];
+
+const statusLabels: Record<OfferStatus | "ALL", string> = {
+  ALL: "All",
+  DRAFT: "Draft",
+  SENT: "Sent",
+  SEEN: "Seen",
+  ACCEPTED: "Accepted",
+  REJECTED: "Rejected",
 };
 
 const formatters: Record<string, Intl.NumberFormat> = {};
@@ -60,6 +82,28 @@ const getOfferTotal = (items: OfferItem[]) => {
 };
 
 export default function OfferList({ offers }: { offers: Offer[] }) {
+  const [activeFilter, setActiveFilter] = useState<OfferStatus | "ALL">("ALL");
+
+  const statusCounts = useMemo(
+    () =>
+      statusOrder.reduce(
+        (counts, status) => {
+          counts[status] = offers.filter((offer) => offer.status === status).length;
+          return counts;
+        },
+        {} as Record<OfferStatus, number>,
+      ),
+    [offers],
+  );
+
+  const filteredOffers = useMemo(
+    () =>
+      activeFilter === "ALL"
+        ? offers
+        : offers.filter((offer) => offer.status === activeFilter),
+    [activeFilter, offers],
+  );
+
   return (
     <section className={s.card}>
       <div className={s.header}>
@@ -67,9 +111,35 @@ export default function OfferList({ offers }: { offers: Offer[] }) {
         <p>{offers.length} saved offers ready for review, sending, or follow-up.</p>
       </div>
 
-      {!offers.length ? (
+      <div className={s.statusOverview}>
+        <button
+          type="button"
+          onClick={() => setActiveFilter("ALL")}
+          className={`${s.statusCard} ${activeFilter === "ALL" ? s.statusCardActive : ""}`}
+        >
+          <span className={s.statusLabel}>{statusLabels.ALL}</span>
+          <strong>{offers.length}</strong>
+        </button>
+        {statusOrder.map((status) => (
+          <button
+            key={status}
+            type="button"
+            onClick={() => setActiveFilter(status)}
+            className={`${s.statusCard} ${activeFilter === status ? s.statusCardActive : ""}`}
+          >
+            <span className={s.statusLabel}>{statusLabels[status]}</span>
+            <strong>{statusCounts[status]}</strong>
+          </button>
+        ))}
+      </div>
+
+      {!filteredOffers.length ? (
         <div className={s.emptyState}>
-          <p>No offers yet.</p>
+          <p>
+            {offers.length
+              ? `No ${statusLabels[activeFilter].toLowerCase()} offers yet.`
+              : "No offers yet."}
+          </p>
         </div>
       ) : (
         <div className={s.tableWrapper}>
@@ -86,7 +156,7 @@ export default function OfferList({ offers }: { offers: Offer[] }) {
               </tr>
             </thead>
             <tbody>
-              {offers.map((offer) => (
+              {filteredOffers.map((offer) => (
                 <tr key={offer.id}>
                   <td>
                     <div className={s.primaryCell}>

@@ -37,6 +37,56 @@
   }
 }
 
+.statusOverview {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.statusCard {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  align-items: flex-start;
+  border: 1px solid #e5e7eb;
+  border-radius: 1rem;
+  background: #f8fafc;
+  padding: 0.9rem 1rem;
+  color: #0f172a;
+  cursor: pointer;
+  transition:
+    transform 160ms ease,
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    background 160ms ease;
+
+  strong {
+    font-size: 1.35rem;
+    line-height: 1;
+  }
+
+  &:hover {
+    transform: translateY(-1px);
+    border-color: #99f6e4;
+    box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08);
+  }
+}
+
+.statusCardActive {
+  border-color: #0f766e;
+  background: linear-gradient(135deg, #ccfbf1, #f0fdfa);
+  box-shadow: 0 10px 22px rgba(15, 118, 110, 0.12);
+}
+
+.statusLabel {
+  color: #475569;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
 .tableWrapper {
   overflow-x: auto;
 }
