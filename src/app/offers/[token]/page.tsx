@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
+import OfferResponseForm from "./OfferResponseForm";
 
 const currencyFormatters: Record<string, Intl.NumberFormat> = {};
 
@@ -49,13 +50,18 @@ export default async function PublicOfferPage({
     select: {
       id: true,
       offerNumber: true,
+      publicToken: true,
       clientName: true,
+      clientEmail: true,
       status: true,
       validUntil: true,
       notes: true,
       createdAt: true,
       sentAt: true,
       seenAt: true,
+      acceptedAt: true,
+      rejectedAt: true,
+      responseNote: true,
       items: {
         select: {
           id: true,
@@ -92,13 +98,18 @@ export default async function PublicOfferPage({
         select: {
           id: true,
           offerNumber: true,
+          publicToken: true,
           clientName: true,
+          clientEmail: true,
           status: true,
           validUntil: true,
           notes: true,
           createdAt: true,
           sentAt: true,
           seenAt: true,
+          acceptedAt: true,
+          rejectedAt: true,
+          responseNote: true,
           items: {
             select: {
               id: true,
@@ -196,9 +207,16 @@ export default async function PublicOfferPage({
                   ))}
                 </tbody>
               </table>
-            </div>
+          </div>
 
-            <aside className="space-y-4 rounded-2xl border border-slate-200 bg-slate-50 p-5">
+            <aside className="space-y-4">
+              <OfferResponseForm
+                token={offer.publicToken!}
+                currentStatus={offer.status}
+                isClosed={offer.status === "ACCEPTED" || offer.status === "REJECTED"}
+              />
+
+              <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
               <div>
                 <p className="text-sm uppercase tracking-[0.18em] text-slate-500">
                   Summary
@@ -211,6 +229,27 @@ export default async function PublicOfferPage({
                 </p>
               </div>
 
+              {offer.acceptedAt ? (
+                <p className="text-sm text-emerald-700">
+                  Accepted {formatDate(offer.acceptedAt)}
+                </p>
+              ) : null}
+
+              {offer.rejectedAt ? (
+                <p className="text-sm text-rose-700">
+                  Rejected {formatDate(offer.rejectedAt)}
+                </p>
+              ) : null}
+
+              {offer.responseNote ? (
+                <div className="rounded-xl border border-slate-200 bg-white p-4">
+                  <p className="text-sm font-semibold text-slate-900">Response note</p>
+                  <p className="mt-2 whitespace-pre-wrap text-sm text-slate-600">
+                    {offer.responseNote}
+                  </p>
+                </div>
+              ) : null}
+
               {offer.notes ? (
                 <div className="rounded-xl border border-slate-200 bg-white p-4">
                   <p className="text-sm font-semibold text-slate-900">Notes</p>
@@ -219,6 +258,7 @@ export default async function PublicOfferPage({
                   </p>
                 </div>
               ) : null}
+              </div>
             </aside>
           </div>
         </section>

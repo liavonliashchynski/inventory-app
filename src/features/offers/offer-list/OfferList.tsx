@@ -21,6 +21,9 @@ type Offer = {
   validUntil: Date | null;
   sentAt: Date | null;
   seenAt: Date | null;
+  acceptedAt: Date | null;
+  rejectedAt: Date | null;
+  responseNote: string | null;
   items: OfferItem[];
 };
 
@@ -105,6 +108,14 @@ export default function OfferList({ offers }: { offers: Offer[] }) {
                       <div className={s.metaText}>
                         Seen {offer.seenAt.toLocaleDateString()}
                       </div>
+                    ) : offer.acceptedAt ? (
+                      <div className={s.metaText}>
+                        Accepted {offer.acceptedAt.toLocaleDateString()}
+                      </div>
+                    ) : offer.rejectedAt ? (
+                      <div className={s.metaText}>
+                        Rejected {offer.rejectedAt.toLocaleDateString()}
+                      </div>
                     ) : offer.sentAt ? (
                       <div className={s.metaText}>
                         Sent {offer.sentAt.toLocaleDateString()}
@@ -134,6 +145,9 @@ export default function OfferList({ offers }: { offers: Offer[] }) {
                         >
                           Open page
                         </Link>
+                      ) : null}
+                      {offer.responseNote ? (
+                        <small className={s.helperText}>{offer.responseNote}</small>
                       ) : null}
                     </div>
                   </td>

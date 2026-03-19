@@ -62,6 +62,9 @@ export default async function DashboardPage() {
           validUntil: true,
           sentAt: true,
           seenAt: true,
+          acceptedAt: true,
+          rejectedAt: true,
+          responseNote: true,
           items: {
             select: {
               id: true,

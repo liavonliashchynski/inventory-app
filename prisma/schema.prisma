@@ -90,6 +90,9 @@ model Offer {
   validUntil DateTime?
   sentAt     DateTime?
   seenAt     DateTime?
+  acceptedAt DateTime?
+  rejectedAt DateTime?
+  responseNote String?
 
   items     OfferItem[]
 

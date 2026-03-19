@@ -1,0 +1,4 @@
+ALTER TABLE "Offer"
+ADD COLUMN "acceptedAt" TIMESTAMP(3),
+ADD COLUMN "rejectedAt" TIMESTAMP(3),
+ADD COLUMN "responseNote" TEXT;
