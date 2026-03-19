@@ -50,6 +50,9 @@ const statusLabels: Record<OfferStatus | "ALL", string> = {
 };
 
 const formatters: Record<string, Intl.NumberFormat> = {};
+const dateFormatter = new Intl.DateTimeFormat("en", {
+  dateStyle: "medium",
+});
 
 const formatMoney = (amount: number, currency: string) => {
   if (!formatters[currency]) {
@@ -80,6 +83,8 @@ const getOfferTotal = (items: OfferItem[]) => {
 
   return formatMoney(total, currencies[0]);
 };
+
+const formatDate = (value: Date) => dateFormatter.format(new Date(value));
 
 export default function OfferList({ offers }: { offers: Offer[] }) {
   const [activeFilter, setActiveFilter] = useState<OfferStatus | "ALL">("ALL");
@@ -176,29 +181,29 @@ export default function OfferList({ offers }: { offers: Offer[] }) {
                     </span>
                     {offer.seenAt ? (
                       <div className={s.metaText}>
-                        Seen {offer.seenAt.toLocaleDateString()}
+                        Seen {formatDate(offer.seenAt)}
                       </div>
                     ) : offer.acceptedAt ? (
                       <div className={s.metaText}>
-                        Accepted {offer.acceptedAt.toLocaleDateString()}
+                        Accepted {formatDate(offer.acceptedAt)}
                       </div>
                     ) : offer.rejectedAt ? (
                       <div className={s.metaText}>
-                        Rejected {offer.rejectedAt.toLocaleDateString()}
+                        Rejected {formatDate(offer.rejectedAt)}
                       </div>
                     ) : offer.sentAt ? (
                       <div className={s.metaText}>
-                        Sent {offer.sentAt.toLocaleDateString()}
+                        Sent {formatDate(offer.sentAt)}
                       </div>
                     ) : null}
                   </td>
                   <td>{getOfferTotal(offer.items)}</td>
                   <td>
                     {offer.validUntil
-                      ? offer.validUntil.toLocaleDateString()
+                      ? formatDate(offer.validUntil)
                       : "No deadline"}
                   </td>
-                  <td>{offer.createdAt.toLocaleDateString()}</td>
+                  <td>{formatDate(offer.createdAt)}</td>
                   <td>
                     <div className={s.actionGroup}>
                       <SendOfferButton
