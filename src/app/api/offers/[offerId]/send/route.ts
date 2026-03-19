@@ -62,6 +62,10 @@ export async function POST(
         company: {
           select: {
             name: true,
+            email: true,
+            phone: true,
+            website: true,
+            address: true,
           },
         },
       },
@@ -99,6 +103,10 @@ export async function POST(
       requestUrl: request.url,
       publicToken,
       companyName: offer.company.name,
+      companyEmail: offer.company.email,
+      companyPhone: offer.company.phone,
+      companyWebsite: offer.company.website,
+      companyAddress: offer.company.address,
       clientName: offer.clientName,
       offerNumber: offer.offerNumber,
       validUntil: offer.validUntil,

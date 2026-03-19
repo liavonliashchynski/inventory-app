@@ -10,6 +10,10 @@ model Company {
   id        String   @id @default(uuid())
   name      String
   slug      String   @unique
+  email     String?
+  phone     String?
+  website   String?
+  address   String?
   createdAt DateTime @default(now())
 
   users     User[]

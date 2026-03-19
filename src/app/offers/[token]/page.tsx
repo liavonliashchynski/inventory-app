@@ -80,6 +80,10 @@ export default async function PublicOfferPage({
       company: {
         select: {
           name: true,
+          email: true,
+          phone: true,
+          website: true,
+          address: true,
         },
       },
     },
@@ -128,6 +132,10 @@ export default async function PublicOfferPage({
           company: {
             select: {
               name: true,
+              email: true,
+              phone: true,
+              website: true,
+              address: true,
             },
           },
         },
@@ -176,6 +184,20 @@ export default async function PublicOfferPage({
                   Prepared for {offer.clientName || "your team"}.
                 </p>
               </div>
+
+              {(offer.company.email || offer.company.phone || offer.company.website) ? (
+                <div
+                  className={`rounded-2xl border px-4 py-3 ${
+                    printMode
+                      ? "border-slate-200 bg-slate-50 text-slate-700"
+                      : "border-white/10 bg-white/10 text-teal-50"
+                  }`}
+                >
+                  {offer.company.email ? <p>{offer.company.email}</p> : null}
+                  {offer.company.phone ? <p>{offer.company.phone}</p> : null}
+                  {offer.company.website ? <p>{offer.company.website}</p> : null}
+                </div>
+              ) : null}
             </div>
 
             <div className={`space-y-3 text-sm ${printMode ? "text-slate-600" : "text-teal-50"}`}>
@@ -291,6 +313,33 @@ export default async function PublicOfferPage({
                     <p className="mt-2 whitespace-pre-wrap text-sm text-slate-600">
                       {offer.notes}
                     </p>
+                  </div>
+                ) : null}
+
+                {(offer.company.email || offer.company.phone || offer.company.website || offer.company.address) ? (
+                  <div className="rounded-xl border border-slate-200 bg-white p-4">
+                    <p className="text-sm font-semibold text-slate-900">Seller details</p>
+                    {offer.company.email ? (
+                      <p className="mt-2 text-sm text-slate-600">{offer.company.email}</p>
+                    ) : null}
+                    {offer.company.phone ? (
+                      <p className="mt-1 text-sm text-slate-600">{offer.company.phone}</p>
+                    ) : null}
+                    {offer.company.website ? (
+                      <a
+                        href={offer.company.website}
+                        className="mt-1 block text-sm text-teal-700 underline decoration-transparent transition hover:decoration-current"
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        {offer.company.website}
+                      </a>
+                    ) : null}
+                    {offer.company.address ? (
+                      <p className="mt-2 whitespace-pre-wrap text-sm text-slate-600">
+                        {offer.company.address}
+                      </p>
+                    ) : null}
                   </div>
                 ) : null}
               </div>

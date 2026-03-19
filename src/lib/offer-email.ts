@@ -46,6 +46,10 @@ export async function sendOfferEmail({
   requestUrl,
   publicToken,
   companyName,
+  companyEmail,
+  companyPhone,
+  companyWebsite,
+  companyAddress,
   clientName,
   offerNumber,
   validUntil,
@@ -56,6 +60,10 @@ export async function sendOfferEmail({
   requestUrl: string;
   publicToken: string;
   companyName: string;
+  companyEmail: string | null;
+  companyPhone: string | null;
+  companyWebsite: string | null;
+  companyAddress: string | null;
   clientName: string | null;
   offerNumber: string | null;
   validUntil: Date | null;
@@ -90,6 +98,12 @@ export async function sendOfferEmail({
     .join(" / ");
 
   const subject = `${companyName} sent ${offerLabel}`;
+  const companyDetails = [
+    companyEmail ? `Email: ${companyEmail}` : null,
+    companyPhone ? `Phone: ${companyPhone}` : null,
+    companyWebsite ? `Website: ${companyWebsite}` : null,
+    companyAddress ? `Address: ${companyAddress}` : null,
+  ].filter(Boolean);
   const text = [
     `Hi ${recipientName},`,
     "",
@@ -104,6 +118,9 @@ export async function sendOfferEmail({
     `Total: ${totalLine}`,
     validUntil ? `Valid until: ${formatDate(validUntil)}` : null,
     notes ? `Notes: ${notes}` : null,
+    "",
+    companyDetails.length ? "Company details:" : null,
+    ...companyDetails,
     "",
     `View offer: ${offerUrl.toString()}`,
   ]
@@ -157,6 +174,33 @@ export async function sendOfferEmail({
       ${
         notes
           ? `<p style="margin:0 0 16px;"><strong>Notes:</strong> ${escapeHtml(notes)}</p>`
+          : ""
+      }
+      ${
+        companyDetails.length
+          ? `<div style="margin:0 0 16px;padding:14px;border:1px solid #e2e8f0;border-radius:12px;background:#f8fafc;">
+              <p style="margin:0 0 8px;font-weight:700;">Company details</p>
+              ${
+                companyEmail
+                  ? `<p style="margin:0 0 6px;">Email: ${escapeHtml(companyEmail)}</p>`
+                  : ""
+              }
+              ${
+                companyPhone
+                  ? `<p style="margin:0 0 6px;">Phone: ${escapeHtml(companyPhone)}</p>`
+                  : ""
+              }
+              ${
+                companyWebsite
+                  ? `<p style="margin:0 0 6px;">Website: <a href="${escapeHtml(companyWebsite)}" style="color:#0f766e;">${escapeHtml(companyWebsite)}</a></p>`
+                  : ""
+              }
+              ${
+                companyAddress
+                  ? `<p style="margin:0;white-space:pre-wrap;">Address: ${escapeHtml(companyAddress)}</p>`
+                  : ""
+              }
+            </div>`
           : ""
       }
       <p style="margin:0;color:#475569;">

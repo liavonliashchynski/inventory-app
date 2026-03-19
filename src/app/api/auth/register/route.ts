@@ -61,7 +61,7 @@ export async function POST(req: Request) {
         emailVerificationToken: tokenHash,
         emailVerificationExpiresAt: expiresAt,
         company: {
-          create: { name: data.companyName, slug },
+          create: { name: data.companyName, slug, email },
         },
       },
       select: { id: true, email: true, role: true, companyId: true },

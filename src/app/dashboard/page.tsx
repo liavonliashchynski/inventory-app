@@ -6,6 +6,7 @@ import AddProductForm from "@/features/products/add-product/AddProductForm";
 import ProductList from "@/features/products/product-list/ProductList";
 import CreateOfferForm from "@/features/offers/create-offer/CreateOfferForm";
 import OfferList from "@/features/offers/offer-list/OfferList";
+import CompanyProfileForm from "@/features/company/profile/CompanyProfileForm";
 import { getSessionUser } from "@/lib/auth";
 
 export default async function DashboardPage() {
@@ -24,7 +25,7 @@ export default async function DashboardPage() {
     redirect("/login");
   }
 
-  const [stats, products, clients, offers] = await Promise.all([
+  const [stats, products, clients, offers, company] = await Promise.all([
     getDashboardStats(user.companyId),
     db.product.findMany({
       where: { companyId: user.companyId },
@@ -76,6 +77,16 @@ export default async function DashboardPage() {
         },
       },
     }),
+    db.company.findUnique({
+      where: { id: user.companyId },
+      select: {
+        name: true,
+        email: true,
+        phone: true,
+        website: true,
+        address: true,
+      },
+    }),
   ]);
 
   return (
@@ -91,6 +102,7 @@ export default async function DashboardPage() {
       </div>
 
       <AddProductForm />
+      {company ? <CompanyProfileForm company={company} /> : null}
       <CreateOfferForm
         clients={clients}
         products={products.map((product) => ({
