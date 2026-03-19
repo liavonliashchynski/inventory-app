@@ -57,6 +57,7 @@ export default async function DashboardPage() {
         status: true,
         clientName: true,
         clientEmail: true,
+        publicToken: true,
         createdAt: true,
         validUntil: true,
         items: {

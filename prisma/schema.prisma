@@ -84,6 +84,7 @@ model Offer {
   client     Client?  @relation(fields: [clientId], references: [id])
   clientName String?
   clientEmail String?
+  publicToken String? @unique
   offerNumber String?
   notes      String?
   validUntil DateTime?

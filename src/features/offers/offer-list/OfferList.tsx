@@ -1,4 +1,6 @@
+import Link from "next/link";
 import s from "./offerList.module.scss";
+import SendOfferButton from "./SendOfferButton";
 
 type OfferItem = {
   id: string;
@@ -14,6 +16,7 @@ type Offer = {
   status: "DRAFT" | "SENT" | "ACCEPTED" | "REJECTED";
   clientName: string | null;
   clientEmail: string | null;
+  publicToken: string | null;
   createdAt: Date;
   validUntil: Date | null;
   items: OfferItem[];
@@ -55,8 +58,8 @@ export default function OfferList({ offers }: { offers: Offer[] }) {
   return (
     <section className={s.card}>
       <div className={s.header}>
-        <h2>Recent draft offers</h2>
-        <p>{offers.length} saved offers ready for review or sending later.</p>
+        <h2>Recent offers</h2>
+        <p>{offers.length} saved offers ready for review, sending, or follow-up.</p>
       </div>
 
       {!offers.length ? (
@@ -74,6 +77,7 @@ export default function OfferList({ offers }: { offers: Offer[] }) {
                 <th>Total</th>
                 <th>Valid Until</th>
                 <th>Created</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -103,6 +107,25 @@ export default function OfferList({ offers }: { offers: Offer[] }) {
                       : "No deadline"}
                   </td>
                   <td>{offer.createdAt.toLocaleDateString()}</td>
+                  <td>
+                    <div className={s.actionGroup}>
+                      <SendOfferButton
+                        offerId={offer.id}
+                        status={offer.status}
+                        clientEmail={offer.clientEmail}
+                      />
+                      {offer.publicToken ? (
+                        <Link
+                          href={`/offers/${offer.publicToken}`}
+                          className={s.linkAction}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          Open page
+                        </Link>
+                      ) : null}
+                    </div>
+                  </td>
                 </tr>
               ))}
             </tbody>
