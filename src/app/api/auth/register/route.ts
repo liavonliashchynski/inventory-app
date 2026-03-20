@@ -42,6 +42,11 @@ export async function POST(req: Request) {
     });
 
     if (!turnstileResult.success) {
+      console.error("Turnstile verification failed during registration", {
+        errorCodes: turnstileResult["error-codes"] || [],
+        email,
+        requestIp,
+      });
       return Response.json(
         { error: "Verification failed. Please try the challenge again." },
         { status: 403 },
@@ -125,6 +130,7 @@ export async function POST(req: Request) {
   } catch (error) {
     if (error instanceof z.ZodError)
       return Response.json({ error: error.issues }, { status: 400 });
+    console.error("Registration failed", error);
     return Response.json({ error: "Internal server error" }, { status: 500 });
   }
 }
