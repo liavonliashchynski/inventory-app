@@ -3,6 +3,7 @@
 import Link from "next/link";
 import styles from "./login.module.scss";
 import { useLogin } from "./useLogin";
+import TurnstileField from "@/features/auth/shared/TurnstileField";
 
 type LoginFormProps = {
   initialEmail?: string;
@@ -27,6 +28,7 @@ export default function LoginForm({
     setPassword,
     handleLogin,
     handleResendVerification,
+    setResendTurnstileToken,
   } = useLogin({
     initialEmail,
     initialVerificationState,
@@ -60,14 +62,20 @@ export default function LoginForm({
         </button>
 
         {needsVerification ? (
-          <button
-            type="button"
-            className={styles.secondaryButton}
-            disabled={isResending}
-            onClick={handleResendVerification}
-          >
-            {isResending ? "Sending..." : "Resend verification email"}
-          </button>
+          <>
+            <TurnstileField
+              onTokenChange={setResendTurnstileToken}
+              className={styles.turnstileField}
+            />
+            <button
+              type="button"
+              className={styles.secondaryButton}
+              disabled={isResending}
+              onClick={handleResendVerification}
+            >
+              {isResending ? "Sending..." : "Resend verification email"}
+            </button>
+          </>
         ) : null}
 
         <Link href="/register" className={styles.secondaryAction}>

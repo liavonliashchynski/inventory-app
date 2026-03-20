@@ -29,6 +29,7 @@ export function useLogin({
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const [needsVerification, setNeedsVerification] = useState(false);
+  const [resendTurnstileToken, setResendTurnstileToken] = useState("");
 
   useEffect(() => {
     if (initialEmail) {
@@ -131,12 +132,17 @@ export function useLogin({
       return;
     }
 
+    if (!resendTurnstileToken) {
+      setError("Please complete the verification challenge first.");
+      return;
+    }
+
     setIsResending(true);
 
     try {
       const res = await fetch("/api/auth/resend-verification", {
         method: "POST",
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email, turnstileToken: resendTurnstileToken }),
         headers: {
           "Content-Type": "application/json",
         },
@@ -149,6 +155,7 @@ export function useLogin({
         return;
       }
 
+      setResendTurnstileToken("");
       setNotice(
         message ||
           "If an unverified account exists for this email, a new verification link is on the way.",
@@ -172,5 +179,6 @@ export function useLogin({
     setPassword,
     handleLogin,
     handleResendVerification,
+    setResendTurnstileToken,
   };
 }

@@ -4,16 +4,45 @@ import {
   createEmailVerificationToken,
   sendVerificationEmail,
 } from "@/lib/email-verification";
+import { getRequestIp } from "@/lib/request-ip";
+import { isTurnstileConfigured, verifyTurnstileToken } from "@/lib/turnstile";
 import { z } from "zod";
 
-const schema = z.object({ email: z.string().trim().email() });
+const schema = z.object({
+  email: z.string().trim().email(),
+  turnstileToken: z
+    .string()
+    .trim()
+    .min(1, "Please complete the verification challenge."),
+});
 const message =
   "If an unverified account exists for this email, a new verification link is on the way.";
 
 export async function POST(req: Request) {
   try {
-    const { email } = schema.parse(await req.json());
+    const { email, turnstileToken } = schema.parse(await req.json());
     const normalizedEmail = email.toLowerCase();
+    const requestIp = getRequestIp(req);
+
+    if (!isTurnstileConfigured()) {
+      return Response.json(
+        { error: "Verification protection is not configured yet." },
+        { status: 500 },
+      );
+    }
+
+    const turnstileResult = await verifyTurnstileToken({
+      token: turnstileToken,
+      ip: requestIp,
+    });
+
+    if (!turnstileResult.success) {
+      return Response.json(
+        { error: "Verification failed. Please try the challenge again." },
+        { status: 403 },
+      );
+    }
+
     const user = await db.user.findUnique({
       where: { email: normalizedEmail },
       select: { id: true, email: true, emailVerifiedAt: true },
