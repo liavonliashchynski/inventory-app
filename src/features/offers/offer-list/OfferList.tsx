@@ -211,6 +211,12 @@ export default function OfferList({ offers }: { offers: Offer[] }) {
                         status={offer.status}
                         clientEmail={offer.clientEmail}
                       />
+                      <Link
+                        href={`/dashboard/offers/${offer.id}`}
+                        className={s.linkAction}
+                      >
+                        View details
+                      </Link>
                       {offer.publicToken ? (
                         <Link
                           href={`/offers/${offer.publicToken}`}
