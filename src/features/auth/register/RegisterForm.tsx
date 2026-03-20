@@ -3,9 +3,10 @@
 import styles from "./register.module.scss";
 import { useRegister } from "./useRegister";
 import Link from "next/link";
+import TurnstileField from "./TurnstileField";
 
 export default function RegisterForm() {
-  const { isLoading, error, handleRegister } = useRegister();
+  const { isLoading, error, handleRegister, setTurnstileToken } = useRegister();
 
   return (
     <div className={styles.page}>
@@ -24,6 +25,7 @@ export default function RegisterForm() {
           placeholder="Company Name"
           required
         />
+        <TurnstileField onTokenChange={setTurnstileToken} />
 
         {error && <p className={styles.error}>{error}</p>}
 

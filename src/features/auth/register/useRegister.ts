@@ -3,6 +3,7 @@ import { useState } from "react";
 export function useRegister() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const [turnstileToken, setTurnstileToken] = useState("");
 
   async function handleRegister(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -16,12 +17,17 @@ export function useRegister() {
       return;
     }
 
+    if (!turnstileToken) {
+      setError("Please complete the verification challenge.");
+      return;
+    }
+
     setIsLoading(true);
 
     try {
       const res = await fetch("/api/auth/register", {
         method: "POST",
-        body: JSON.stringify(formValues),
+        body: JSON.stringify({ ...formValues, turnstileToken }),
         headers: { "Content-Type": "application/json" },
       });
 
@@ -52,5 +58,5 @@ export function useRegister() {
       setIsLoading(false);
     }
   }
-  return { isLoading, error, handleRegister };
+  return { isLoading, error, handleRegister, setTurnstileToken };
 }

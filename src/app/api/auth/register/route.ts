@@ -4,6 +4,8 @@ import {
   createEmailVerificationToken,
   sendVerificationEmail,
 } from "@/lib/email-verification";
+import { getRequestIp } from "@/lib/request-ip";
+import { isTurnstileConfigured, verifyTurnstileToken } from "@/lib/turnstile";
 import bcrypt from "bcrypt";
 import { z } from "zod";
 
@@ -11,6 +13,7 @@ const schema = z.object({
   email: z.string().trim().email(),
   password: z.string().min(6),
   companyName: z.string().trim().min(2),
+  turnstileToken: z.string().trim().min(1, "Please complete the verification challenge."),
 });
 
 const generateSlug = (name: string) =>
@@ -24,6 +27,26 @@ export async function POST(req: Request) {
   try {
     const data = schema.parse(await req.json());
     const email = data.email.toLowerCase();
+    const requestIp = getRequestIp(req);
+
+    if (!isTurnstileConfigured()) {
+      return Response.json(
+        { error: "Registration protection is not configured yet." },
+        { status: 500 },
+      );
+    }
+
+    const turnstileResult = await verifyTurnstileToken({
+      token: data.turnstileToken,
+      ip: requestIp,
+    });
+
+    if (!turnstileResult.success) {
+      return Response.json(
+        { error: "Verification failed. Please try the challenge again." },
+        { status: 403 },
+      );
+    }
 
     const existingUser = await db.user.findUnique({
       where: { email },
