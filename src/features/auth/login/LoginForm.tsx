@@ -37,51 +37,72 @@ export default function LoginForm({
 
   return (
     <div className={styles.page}>
-      <form className={styles.form} onSubmit={handleLogin}>
-        <h1>Login</h1>
+      <div className={styles.shell}>
+        <div className={styles.brandPanel}>
+          <Link href="/" className={styles.brandLink}>
+            Inventory App
+          </Link>
+          <p className={styles.brandText}>
+            Inventory and sales visibility for modern teams.
+          </p>
+        </div>
 
-        <input
-          type="email"
-          placeholder="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
+        <form className={styles.form} onSubmit={handleLogin}>
+          <span className={styles.badge}>Sales workspace</span>
+          <h1>Welcome back</h1>
+          <p className={styles.lead}>
+            Sign in to manage products, pricing, offers, and follow-ups from
+            one place.
+          </p>
 
-        <input
-          type="password"
-          placeholder="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
 
-        {notice ? <p className={styles.notice}>{notice}</p> : null}
-        {error ? <p className={styles.error}>{error}</p> : null}
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
 
-        <button type="submit" disabled={isLoading}>
-          {isLoading ? "Signing in..." : "Login"}
-        </button>
+          {notice ? <p className={styles.notice}>{notice}</p> : null}
+          {error ? <p className={styles.error}>{error}</p> : null}
 
-        {needsVerification ? (
-          <>
-            <TurnstileField
-              onTokenChange={setResendTurnstileToken}
-              className={styles.turnstileField}
-            />
-            <button
-              type="button"
-              className={styles.secondaryButton}
-              disabled={isResending}
-              onClick={handleResendVerification}
-            >
-              {isResending ? "Sending..." : "Resend verification email"}
-            </button>
-          </>
-        ) : null}
+          <button type="submit" disabled={isLoading}>
+            {isLoading ? "Signing in..." : "Login"}
+          </button>
 
-        <Link href="/register" className={styles.secondaryAction}>
-          Create an account
-        </Link>
-      </form>
+          {needsVerification ? (
+            <>
+              <TurnstileField
+                onTokenChange={setResendTurnstileToken}
+                className={styles.turnstileField}
+              />
+              <button
+                type="button"
+                className={styles.secondaryButton}
+                disabled={isResending}
+                onClick={handleResendVerification}
+              >
+                {isResending ? "Sending..." : "Resend verification email"}
+              </button>
+            </>
+          ) : null}
+
+          <p className={styles.helperText}>
+            New here? Create a workspace and we&apos;ll send a verification
+            link before first sign-in.
+          </p>
+
+          <Link href="/register" className={styles.secondaryAction}>
+            Create an account
+          </Link>
+        </form>
+      </div>
     </div>
   );
 }
