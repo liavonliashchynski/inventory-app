@@ -1,0 +1,132 @@
+.panel {
+  position: relative;
+  isolation: isolate;
+  width: 100%;
+}
+
+.summary {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  width: 100%;
+  padding: 1.05rem 1.15rem;
+  border: 1px solid var(--brand-border);
+  border-radius: 0.95rem;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(15, 23, 42, 0.88));
+  box-shadow: var(--brand-shadow);
+  text-align: left;
+  cursor: pointer;
+  position: relative;
+  z-index: 1;
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    transform 160ms ease;
+  appearance: none;
+
+  &:hover {
+    border-color: var(--brand-border-strong);
+    box-shadow: 0 16px 30px rgba(2, 6, 23, 0.36);
+    transform: translateY(-1px);
+  }
+}
+
+.copy {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  min-width: 0;
+
+  h2 {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--brand-text-strong);
+    letter-spacing: -0.02em;
+  }
+
+  p {
+    margin: 0;
+    color: var(--brand-muted);
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  padding: 0.28rem 0.65rem;
+  border-radius: 9999px;
+  background: var(--brand-sky-soft);
+  color: #bfdbfe;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex-shrink: 0;
+  margin-left: auto;
+  padding: 0.5rem 0.75rem;
+  border-radius: 9999px;
+  background: rgba(15, 23, 42, 0.42);
+  border: 1px solid var(--brand-border);
+  color: var(--brand-text);
+  font-size: 0.82rem;
+  font-weight: 700;
+  box-shadow: 0 6px 14px rgba(2, 6, 23, 0.22);
+}
+
+.summary:hover .toggle {
+  border-color: var(--brand-border-strong);
+  background: rgba(30, 41, 59, 0.72);
+}
+
+.chevron {
+  width: 0.65rem;
+  height: 0.65rem;
+  margin-top: -0.1rem;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(45deg);
+  transition: transform 160ms ease;
+}
+
+.chevronOpen {
+  transform: rotate(225deg);
+}
+
+.body {
+  margin-top: 0.9rem;
+
+  > :global(section) {
+    margin: 0 !important;
+  }
+
+  > :global(section) > :first-child {
+    display: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .summary {
+    flex-direction: column;
+    padding: 0.95rem 1rem;
+  }
+
+  .toggle {
+    margin-left: 0;
+  }
+
+  .body {
+    margin-top: 0.75rem;
+  }
+}

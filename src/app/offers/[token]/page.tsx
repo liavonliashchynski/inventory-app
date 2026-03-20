@@ -161,7 +161,7 @@ export default async function PublicOfferPage({
         }`}
       >
         <section
-          className={`border-b px-8 py-10 ${
+          className={`border-b px-5 py-8 sm:px-8 sm:py-10 ${
             printMode
               ? "border-slate-200 bg-white text-slate-900"
               : "border-slate-200 bg-[linear-gradient(135deg,#0f766e,#115e59)] text-white"
@@ -177,7 +177,7 @@ export default async function PublicOfferPage({
                 Offer from {offer.company.name}
               </p>
               <div>
-                <h1 className="text-3xl font-semibold tracking-tight">
+                <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
                   {offer.offerNumber || "Offer"}
                 </h1>
                 <p className={`mt-2 ${printMode ? "text-slate-600" : "text-teal-50"}`}>
@@ -193,9 +193,9 @@ export default async function PublicOfferPage({
                       : "border-white/10 bg-white/10 text-teal-50"
                   }`}
                 >
-                  {offer.company.email ? <p>{offer.company.email}</p> : null}
+                  {offer.company.email ? <p className="break-words">{offer.company.email}</p> : null}
                   {offer.company.phone ? <p>{offer.company.phone}</p> : null}
-                  {offer.company.website ? <p>{offer.company.website}</p> : null}
+                  {offer.company.website ? <p className="break-words">{offer.company.website}</p> : null}
                 </div>
               ) : null}
             </div>
@@ -224,14 +224,38 @@ export default async function PublicOfferPage({
           </div>
         </section>
 
-        <section className="px-8 py-8">
+        <section className="px-5 py-6 sm:px-8 sm:py-8">
           <div
             className={`grid gap-6 ${
               printMode ? "md:grid-cols-[minmax(0,1fr)_220px]" : "md:grid-cols-[minmax(0,1fr)_240px]"
             }`}
           >
             <div className="overflow-hidden rounded-2xl border border-slate-200">
-              <table className="w-full border-collapse">
+              <div className="space-y-3 p-4 md:hidden">
+                {offer.items.map((item) => (
+                  <div
+                    key={item.id}
+                    className="rounded-2xl border border-slate-200 bg-white p-4"
+                  >
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                      <div>
+                        <p className="font-semibold text-slate-900">{item.productName}</p>
+                        <p className="mt-1 text-sm text-slate-500">Qty {item.quantity}</p>
+                      </div>
+                      <p className="text-sm font-medium text-slate-600">
+                        {formatMoney(Number(item.price), item.currency)} each
+                      </p>
+                    </div>
+                    <div className="mt-4 flex items-center justify-between rounded-xl bg-slate-50 px-3 py-2">
+                      <span className="text-sm text-slate-500">Line total</span>
+                      <span className="font-semibold text-slate-900">
+                        {formatMoney(Number(item.price) * item.quantity, item.currency)}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <table className="hidden w-full border-collapse md:table">
                 <thead className="bg-slate-50 text-left text-sm uppercase tracking-[0.16em] text-slate-500">
                   <tr>
                     <th className="px-4 py-3 font-semibold">Item</th>
@@ -273,7 +297,7 @@ export default async function PublicOfferPage({
                 />
               ) : null}
 
-              <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
+              <div className="space-y-4 rounded-2xl border border-slate-200 bg-slate-50 p-5">
                 <div>
                   <p className="text-sm uppercase tracking-[0.18em] text-slate-500">
                     Summary
@@ -328,7 +352,7 @@ export default async function PublicOfferPage({
                     {offer.company.website ? (
                       <a
                         href={offer.company.website}
-                        className="mt-1 block text-sm text-teal-700 underline decoration-transparent transition hover:decoration-current"
+                        className="mt-1 block break-words text-sm text-teal-700 underline decoration-transparent transition hover:decoration-current"
                         target="_blank"
                         rel="noreferrer"
                       >

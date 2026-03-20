@@ -86,6 +86,26 @@ const getOfferTotal = (items: OfferItem[]) => {
 
 const formatDate = (value: Date) => dateFormatter.format(new Date(value));
 
+const getStatusDetail = (offer: Offer) => {
+  if (offer.seenAt) {
+    return `Seen ${formatDate(offer.seenAt)}`;
+  }
+
+  if (offer.acceptedAt) {
+    return `Accepted ${formatDate(offer.acceptedAt)}`;
+  }
+
+  if (offer.rejectedAt) {
+    return `Rejected ${formatDate(offer.rejectedAt)}`;
+  }
+
+  if (offer.sentAt) {
+    return `Sent ${formatDate(offer.sentAt)}`;
+  }
+
+  return null;
+};
+
 export default function OfferList({ offers }: { offers: Offer[] }) {
   const [activeFilter, setActiveFilter] = useState<OfferStatus | "ALL">("ALL");
 
@@ -147,106 +167,184 @@ export default function OfferList({ offers }: { offers: Offer[] }) {
           </p>
         </div>
       ) : (
-        <div className={s.tableWrapper}>
-          <table className={s.table}>
-            <thead>
-              <tr>
-                <th>Offer</th>
-                <th>Client</th>
-                <th>Status</th>
-                <th>Total</th>
-                <th>Valid Until</th>
-                <th>Created</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredOffers.map((offer) => (
-                <tr key={offer.id}>
-                  <td>
+        <>
+          <div className={s.mobileList}>
+            {filteredOffers.map((offer) => {
+              const statusDetail = getStatusDetail(offer);
+
+              return (
+                <article key={offer.id} className={s.mobileCard}>
+                  <div className={s.mobileCardHeader}>
                     <div className={s.primaryCell}>
                       <span>{offer.offerNumber || "Draft"}</span>
                       <small>{offer.items.length} item(s)</small>
                     </div>
-                  </td>
-                  <td>
-                    <div className={s.primaryCell}>
-                      <span>{offer.clientName || "Unknown client"}</span>
-                      <small>{offer.clientEmail || "No email saved"}</small>
-                    </div>
-                  </td>
-                  <td>
                     <span className={`${s.badge} ${s[offer.status.toLowerCase()]}`}>
                       {offer.status}
                     </span>
-                    {offer.seenAt ? (
-                      <div className={s.metaText}>
-                        Seen {formatDate(offer.seenAt)}
-                      </div>
-                    ) : offer.acceptedAt ? (
-                      <div className={s.metaText}>
-                        Accepted {formatDate(offer.acceptedAt)}
-                      </div>
-                    ) : offer.rejectedAt ? (
-                      <div className={s.metaText}>
-                        Rejected {formatDate(offer.rejectedAt)}
-                      </div>
-                    ) : offer.sentAt ? (
-                      <div className={s.metaText}>
-                        Sent {formatDate(offer.sentAt)}
-                      </div>
-                    ) : null}
-                  </td>
-                  <td>{getOfferTotal(offer.items)}</td>
-                  <td>
-                    {offer.validUntil
-                      ? formatDate(offer.validUntil)
-                      : "No deadline"}
-                  </td>
-                  <td>{formatDate(offer.createdAt)}</td>
-                  <td>
-                    <div className={s.actionGroup}>
-                      <SendOfferButton
-                        offerId={offer.id}
-                        status={offer.status}
-                        clientEmail={offer.clientEmail}
-                      />
-                      <Link
-                        href={`/dashboard/offers/${offer.id}`}
-                        className={s.linkAction}
-                      >
-                        View details
-                      </Link>
-                      {offer.publicToken ? (
-                        <Link
-                          href={`/offers/${offer.publicToken}`}
-                          className={s.linkAction}
-                          target="_blank"
-                          rel="noreferrer"
-                        >
-                          Open page
-                        </Link>
-                      ) : null}
-                      {offer.publicToken ? (
-                        <Link
-                          href={`/offers/${offer.publicToken}?print=1`}
-                          className={s.linkAction}
-                          target="_blank"
-                          rel="noreferrer"
-                        >
-                          Export PDF
-                        </Link>
-                      ) : null}
-                      {offer.responseNote ? (
-                        <small className={s.helperText}>{offer.responseNote}</small>
-                      ) : null}
+                  </div>
+
+                  <div className={s.mobileMetaGrid}>
+                    <div className={s.mobileMetaBlock}>
+                      <span className={s.metaLabel}>Client</span>
+                      <strong>{offer.clientName || "Unknown client"}</strong>
+                      <small>{offer.clientEmail || "No email saved"}</small>
                     </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+
+                    <div className={s.mobileMetaBlock}>
+                      <span className={s.metaLabel}>Total</span>
+                      <strong>{getOfferTotal(offer.items)}</strong>
+                    </div>
+
+                    <div className={s.mobileMetaBlock}>
+                      <span className={s.metaLabel}>Valid until</span>
+                      <strong>
+                        {offer.validUntil
+                          ? formatDate(offer.validUntil)
+                          : "No deadline"}
+                      </strong>
+                    </div>
+
+                    <div className={s.mobileMetaBlock}>
+                      <span className={s.metaLabel}>Created</span>
+                      <strong>{formatDate(offer.createdAt)}</strong>
+                    </div>
+                  </div>
+
+                  {statusDetail ? (
+                    <p className={s.mobileStatusText}>{statusDetail}</p>
+                  ) : null}
+
+                  <div className={s.actionGroup}>
+                    <SendOfferButton
+                      offerId={offer.id}
+                      status={offer.status}
+                      clientEmail={offer.clientEmail}
+                    />
+                    <Link
+                      href={`/dashboard/offers/${offer.id}`}
+                      className={s.linkAction}
+                    >
+                      View details
+                    </Link>
+                    {offer.publicToken ? (
+                      <Link
+                        href={`/offers/${offer.publicToken}`}
+                        className={s.linkAction}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        Open page
+                      </Link>
+                    ) : null}
+                    {offer.publicToken ? (
+                      <Link
+                        href={`/offers/${offer.publicToken}?print=1`}
+                        className={s.linkAction}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        Export PDF
+                      </Link>
+                    ) : null}
+                    {offer.responseNote ? (
+                      <small className={s.helperText}>{offer.responseNote}</small>
+                    ) : null}
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+
+          <div className={s.desktopTable}>
+            <div className={s.tableWrapper}>
+              <table className={s.table}>
+                <thead>
+                  <tr>
+                    <th>Offer</th>
+                    <th>Client</th>
+                    <th>Status</th>
+                    <th>Total</th>
+                    <th>Valid Until</th>
+                    <th>Created</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredOffers.map((offer) => (
+                    <tr key={offer.id}>
+                      <td>
+                        <div className={s.primaryCell}>
+                          <span>{offer.offerNumber || "Draft"}</span>
+                          <small>{offer.items.length} item(s)</small>
+                        </div>
+                      </td>
+                      <td>
+                        <div className={s.primaryCell}>
+                          <span>{offer.clientName || "Unknown client"}</span>
+                          <small>{offer.clientEmail || "No email saved"}</small>
+                        </div>
+                      </td>
+                      <td>
+                        <span className={`${s.badge} ${s[offer.status.toLowerCase()]}`}>
+                          {offer.status}
+                        </span>
+                        {getStatusDetail(offer) ? (
+                          <div className={s.metaText}>{getStatusDetail(offer)}</div>
+                        ) : null}
+                      </td>
+                      <td>{getOfferTotal(offer.items)}</td>
+                      <td>
+                        {offer.validUntil
+                          ? formatDate(offer.validUntil)
+                          : "No deadline"}
+                      </td>
+                      <td>{formatDate(offer.createdAt)}</td>
+                      <td>
+                        <div className={s.actionGroup}>
+                          <SendOfferButton
+                            offerId={offer.id}
+                            status={offer.status}
+                            clientEmail={offer.clientEmail}
+                          />
+                          <Link
+                            href={`/dashboard/offers/${offer.id}`}
+                            className={s.linkAction}
+                          >
+                            View details
+                          </Link>
+                          {offer.publicToken ? (
+                            <Link
+                              href={`/offers/${offer.publicToken}`}
+                              className={s.linkAction}
+                              target="_blank"
+                              rel="noreferrer"
+                            >
+                              Open page
+                            </Link>
+                          ) : null}
+                          {offer.publicToken ? (
+                            <Link
+                              href={`/offers/${offer.publicToken}?print=1`}
+                              className={s.linkAction}
+                              target="_blank"
+                              rel="noreferrer"
+                            >
+                              Export PDF
+                            </Link>
+                          ) : null}
+                          {offer.responseNote ? (
+                            <small className={s.helperText}>{offer.responseNote}</small>
+                          ) : null}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </>
       )}
     </section>
   );

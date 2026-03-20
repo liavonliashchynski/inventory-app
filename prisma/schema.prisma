@@ -48,6 +48,7 @@ model Product {
   name      String
   price     Decimal  @db.Decimal(10,2)
   currency  Currency @default(USD)
+  quantity  Int      @default(0)
 
   companyId String
   company   Company  @relation(fields: [companyId], references: [id])

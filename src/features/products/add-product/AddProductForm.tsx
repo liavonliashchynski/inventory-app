@@ -73,6 +73,21 @@ export default function AddProductForm() {
           </label>
         </div>
 
+        <div className={styles.field}>
+          <label>
+            Quantity
+            <input
+              name="quantity"
+              type="number"
+              min="0"
+              step="1"
+              required
+              defaultValue="0"
+              placeholder="0"
+            />
+          </label>
+        </div>
+
         <button disabled={isPending}>
           {isPending ? "Adding..." : "Add product"}
         </button>

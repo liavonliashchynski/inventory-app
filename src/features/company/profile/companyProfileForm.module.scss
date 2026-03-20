@@ -1,10 +1,10 @@
 .card {
   margin-top: 2rem;
   padding: 1.5rem;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--brand-border);
   border-radius: 1rem;
-  background: linear-gradient(135deg, #f8fafc, #ffffff);
-  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+  background: linear-gradient(135deg, var(--brand-surface), var(--brand-surface-soft));
+  box-shadow: var(--brand-shadow);
 }
 
 .header {
@@ -13,12 +13,12 @@
   h2 {
     margin: 0;
     font-size: 1.25rem;
-    color: #111827;
+    color: var(--brand-text-strong);
   }
 
   p {
     margin: 0.35rem 0 0;
-    color: #6b7280;
+    color: var(--brand-muted);
     font-size: 0.95rem;
   }
 }
@@ -42,26 +42,26 @@
   label {
     font-size: 0.9rem;
     font-weight: 600;
-    color: #111827;
+    color: var(--brand-muted-strong);
   }
 
   input,
   textarea {
     width: 100%;
-    border: 1px solid #cbd5e1;
+    border: 1px solid var(--brand-border-strong);
     border-radius: 0.85rem;
     padding: 0.8rem 0.9rem;
     font: inherit;
-    color: #0f172a;
-    background: #ffffff;
+    color: var(--brand-text);
+    background: var(--brand-surface-soft);
     transition:
       border-color 160ms ease,
       box-shadow 160ms ease;
 
     &:focus {
       outline: none;
-      border-color: #0f766e;
-      box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.12);
+      border-color: var(--brand-focus);
+      box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.18);
     }
   }
 
@@ -81,7 +81,7 @@
     border: 0;
     border-radius: 9999px;
     padding: 0.75rem 1.25rem;
-    background: #0f766e;
+    background: var(--brand-primary);
     color: #ffffff;
     font: inherit;
     font-weight: 700;
@@ -91,18 +91,24 @@
       background 160ms ease;
 
     &:hover:not(:disabled) {
-      background: #115e59;
+      background: var(--brand-primary-hover);
       transform: translateY(-1px);
     }
 
     &:disabled {
-      background: #94a3b8;
+      background: rgba(48, 4, 83, 0.45);
       cursor: not-allowed;
     }
   }
 }
 
 .message {
-  color: #475569;
+  color: var(--brand-muted);
   font-size: 0.9rem;
+}
+
+@media (max-width: 639px) {
+  .card {
+    padding: 1rem;
+  }
 }
