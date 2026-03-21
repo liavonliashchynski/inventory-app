@@ -108,7 +108,7 @@ export default async function DashboardPage() {
     <div className="relative min-h-screen overflow-hidden bg-slate-950 text-slate-50">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(56,189,248,0.18),_transparent_34%)]" />
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_bottom_right,_rgba(45,212,191,0.14),_transparent_30%)]" />
-      <div className="relative z-10 mx-auto flex w-full max-w-[1560px] flex-col gap-6 px-4 py-5 sm:px-6 sm:py-6 lg:px-8">
+      <div className="relative z-10 mx-auto flex w-full max-w-[1760px] flex-col gap-6 px-4 py-5 sm:px-6 sm:py-6 lg:px-8 2xl:px-10">
         <div className="relative rounded-[1.35rem] border border-white/10 bg-white/5 px-5 py-5 shadow-[0_20px_45px_rgba(2,6,23,0.32)] backdrop-blur sm:px-6 sm:py-6">
           <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
             <div className="max-w-2xl">
@@ -128,7 +128,7 @@ export default async function DashboardPage() {
           </div>
         </div>
 
-        <div className="grid items-start gap-6 xl:grid-cols-[minmax(320px,0.95fr)_minmax(0,2fr)]">
+        <div className="grid items-start gap-6 xl:grid-cols-[minmax(420px,1.2fr)_minmax(0,1.8fr)]">
           <div className="space-y-5">
             {company ? (
               <CollapsibleDashboardSection

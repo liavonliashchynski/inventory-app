@@ -23,6 +23,7 @@ type ClientOption = {
 type OfferLine = {
   id: string;
   productId: string;
+  productSearch: string;
   quantity: number;
 };
 
@@ -42,6 +43,7 @@ const formatMoney = (price: string, currency: string) => {
 const createLine = (id: string): OfferLine => ({
   id,
   productId: "",
+  productSearch: "",
   quantity: 1,
 });
 
@@ -61,6 +63,7 @@ export default function CreateOfferForm({
   const [validUntil, setValidUntil] = useState("");
   const [notes, setNotes] = useState("");
   const [items, setItems] = useState<OfferLine[]>(() => [createLine("1")]);
+  const [openProductMenuId, setOpenProductMenuId] = useState<string | null>(null);
   const [msg, setMsg] = useState<{
     type: "error" | "success";
     text: string;
@@ -71,7 +74,7 @@ export default function CreateOfferForm({
 
   const updateItem = (
     id: string,
-    patch: Partial<Pick<OfferLine, "productId" | "quantity">>,
+    patch: Partial<Pick<OfferLine, "productId" | "productSearch" | "quantity">>,
   ) => {
     setItems((current) =>
       current.map((item) => (item.id === id ? { ...item, ...patch } : item)),
@@ -89,6 +92,14 @@ export default function CreateOfferForm({
     );
   };
 
+  const selectProduct = (id: string, product: ProductOption) => {
+    updateItem(id, {
+      productId: product.id,
+      productSearch: product.name,
+    });
+    setOpenProductMenuId(null);
+  };
+
   const resetForm = () => {
     nextItemId.current = 2;
     setSelectedClientId("");
@@ -98,6 +109,7 @@ export default function CreateOfferForm({
     setValidUntil("");
     setNotes("");
     setItems([createLine("1")]);
+    setOpenProductMenuId(null);
   };
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -274,25 +286,97 @@ export default function CreateOfferForm({
               const selectedProduct = products.find(
                 (product) => product.id === item.productId,
               );
+              const normalizedSearch = item.productSearch.trim().toLowerCase();
+              const filteredProducts = (
+                normalizedSearch
+                  ? products.filter((product) =>
+                      product.name.toLowerCase().includes(normalizedSearch),
+                    )
+                  : products
+              ).slice(0, 8);
+              const isProductMenuOpen = openProductMenuId === item.id;
 
               return (
                 <div key={item.id} className={styles.itemRow}>
-                  <div className={styles.field}>
+                  <div className={`${styles.field} ${styles.productField}`}>
                     <label htmlFor={`product-${item.id}`}>Product</label>
-                    <select
-                      id={`product-${item.id}`}
-                      value={item.productId}
-                      onChange={(event) =>
-                        updateItem(item.id, { productId: event.target.value })
-                      }
+                    <div
+                      className={styles.productPicker}
+                      onBlur={(event) => {
+                        const nextFocused = event.relatedTarget as Node | null;
+
+                        if (!event.currentTarget.contains(nextFocused)) {
+                          setOpenProductMenuId((current) =>
+                            current === item.id ? null : current,
+                          );
+                        }
+                      }}
                     >
-                      <option value="">Select product</option>
-                      {products.map((product) => (
-                        <option key={product.id} value={product.id}>
-                          {product.name}
-                        </option>
-                      ))}
-                    </select>
+                      <input
+                        id={`product-${item.id}`}
+                        type="text"
+                        role="combobox"
+                        aria-expanded={isProductMenuOpen}
+                        aria-controls={`product-options-${item.id}`}
+                        aria-autocomplete="list"
+                        value={item.productSearch}
+                        onFocus={() => setOpenProductMenuId(item.id)}
+                        onChange={(event) => {
+                          const nextValue = event.target.value;
+                          const exactMatch = products.find(
+                            (product) =>
+                              product.name.toLowerCase() === nextValue.trim().toLowerCase(),
+                          );
+
+                          updateItem(item.id, {
+                            productSearch: nextValue,
+                            productId: exactMatch?.id ?? "",
+                          });
+                          setOpenProductMenuId(item.id);
+                        }}
+                        onKeyDown={(event) => {
+                          if (event.key === "Escape") {
+                            setOpenProductMenuId(null);
+                            return;
+                          }
+
+                          if (event.key === "Enter" && filteredProducts.length) {
+                            event.preventDefault();
+                            selectProduct(item.id, filteredProducts[0]);
+                          }
+                        }}
+                        placeholder="Search or choose product"
+                        autoComplete="off"
+                        aria-label={`Search products for item ${index + 1}`}
+                      />
+                      {isProductMenuOpen ? (
+                        <div
+                          id={`product-options-${item.id}`}
+                          className={styles.productMenu}
+                          role="listbox"
+                        >
+                          {filteredProducts.length ? (
+                            filteredProducts.map((product) => (
+                              <button
+                                key={product.id}
+                                type="button"
+                                className={`${styles.productOption} ${
+                                  product.id === item.productId ? styles.productOptionActive : ""
+                                }`}
+                                onClick={() => selectProduct(item.id, product)}
+                                role="option"
+                                aria-selected={product.id === item.productId}
+                              >
+                                <span>{product.name}</span>
+                                <span>{formatMoney(product.price, product.currency)}</span>
+                              </button>
+                            ))
+                          ) : (
+                            <div className={styles.productEmpty}>No matching products</div>
+                          )}
+                        </div>
+                      ) : null}
+                    </div>
                   </div>
 
                   <div className={styles.field}>
@@ -314,11 +398,8 @@ export default function CreateOfferForm({
                   <div className={styles.itemMeta}>
                     <span>
                       {selectedProduct
-                        ? formatMoney(selectedProduct.price, selectedProduct.currency)
-                        : "Choose a product"}
-                    </span>
-                    <span>
-                      {selectedProduct ? selectedProduct.currency : `Item ${index + 1}`}
+                        ? `Price: ${formatMoney(selectedProduct.price, selectedProduct.currency)}`
+                        : "Price: -"}
                     </span>
                   </div>
 
