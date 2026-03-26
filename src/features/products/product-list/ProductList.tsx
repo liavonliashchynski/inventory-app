@@ -9,6 +9,18 @@ type Item = {
   currency: "USD" | "EUR" | "PLN";
   quantity: number;
   createdAt: Date;
+  stockAdjustments: {
+    id: string;
+    previousQuantity: number;
+    newQuantity: number;
+    delta: number;
+    comment: string;
+    createdAt: Date;
+    changedByUser: {
+      name: string | null;
+      email: string;
+    } | null;
+  }[];
 };
 
 const dateFormatter = new Intl.DateTimeFormat("en", {
@@ -26,6 +38,9 @@ const formatMoney = (price: string, currency: string) => {
   }
   return formatters[currency].format(+price);
 };
+
+const getAdjustmentUserLabel = (name: string | null, email: string | undefined) =>
+  name || email || "Unknown user";
 
 export default function ProductList({ products: p }: { products: Item[] }) {
   return (
@@ -70,6 +85,40 @@ export default function ProductList({ products: p }: { products: Item[] }) {
                     <strong>{dateFormatter.format(new Date(product.createdAt))}</strong>
                   </div>
                 </div>
+                {product.stockAdjustments.length ? (
+                  <div className={s.historyBlock}>
+                    <p className={s.historyTitle}>Recent stock history</p>
+                    <div className={s.historyList}>
+                      {product.stockAdjustments.map((entry) => (
+                        <article key={entry.id} className={s.historyItem}>
+                          <div className={s.historyTopRow}>
+                            <span
+                              className={`${s.deltaBadge} ${
+                                entry.delta >= 0 ? s.deltaPositive : s.deltaNegative
+                              }`}
+                            >
+                              {entry.delta >= 0 ? `+${entry.delta}` : entry.delta}
+                            </span>
+                            <span className={s.historyDate}>
+                              {dateFormatter.format(new Date(entry.createdAt))}
+                            </span>
+                          </div>
+                          <p className={s.historyComment}>{entry.comment}</p>
+                          <p className={s.historyMeta}>
+                            {entry.previousQuantity} to {entry.newQuantity}
+                            {" by "}
+                            {getAdjustmentUserLabel(
+                              entry.changedByUser?.name ?? null,
+                              entry.changedByUser?.email,
+                            )}
+                          </p>
+                        </article>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <p className={s.noHistory}>No stock changes yet</p>
+                )}
               </article>
             ))}
           </div>
@@ -84,6 +133,7 @@ export default function ProductList({ products: p }: { products: Item[] }) {
                     <th>Quantity</th>
                     <th>Currency</th>
                     <th>Created</th>
+                    <th>Stock History</th>
                     <th>Actions</th>
                   </tr>
                 </thead>
@@ -95,6 +145,39 @@ export default function ProductList({ products: p }: { products: Item[] }) {
                       <td>{x.quantity}</td>
                       <td>{x.currency}</td>
                       <td>{dateFormatter.format(new Date(x.createdAt))}</td>
+                      <td>
+                        {x.stockAdjustments.length ? (
+                          <div className={s.historyList}>
+                            {x.stockAdjustments.map((entry) => (
+                              <article key={entry.id} className={s.historyItem}>
+                                <div className={s.historyTopRow}>
+                                  <span
+                                    className={`${s.deltaBadge} ${
+                                      entry.delta >= 0 ? s.deltaPositive : s.deltaNegative
+                                    }`}
+                                  >
+                                    {entry.delta >= 0 ? `+${entry.delta}` : entry.delta}
+                                  </span>
+                                  <span className={s.historyDate}>
+                                    {dateFormatter.format(new Date(entry.createdAt))}
+                                  </span>
+                                </div>
+                                <p className={s.historyComment}>{entry.comment}</p>
+                                <p className={s.historyMeta}>
+                                  {entry.previousQuantity} to {entry.newQuantity}
+                                  {" by "}
+                                  {getAdjustmentUserLabel(
+                                    entry.changedByUser?.name ?? null,
+                                    entry.changedByUser?.email,
+                                  )}
+                                </p>
+                              </article>
+                            ))}
+                          </div>
+                        ) : (
+                          <span className={s.noHistory}>No stock changes yet</span>
+                        )}
+                      </td>
                       <td>
                         <div className={s.actionGroup}>
                           <EditProductButton product={x} />

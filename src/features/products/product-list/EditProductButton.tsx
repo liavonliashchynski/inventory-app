@@ -38,6 +38,7 @@ export default function EditProductButton({
           price: formData.get("price"),
           currency: formData.get("currency"),
           quantity: formData.get("quantity"),
+          adjustmentComment: formData.get("adjustmentComment"),
         }),
       });
 
@@ -108,6 +109,15 @@ export default function EditProductButton({
               step="1"
               defaultValue={product.quantity}
               required
+            />
+          </label>
+
+          <label className={s.editField}>
+            <span>Stock comment</span>
+            <textarea
+              name="adjustmentComment"
+              rows={3}
+              placeholder="Required when quantity changes, for example: Stock count correction after warehouse audit."
             />
           </label>
 

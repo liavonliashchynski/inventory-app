@@ -36,6 +36,7 @@ model User {
 
   companyId String
   company   Company  @relation(fields: [companyId], references: [id])
+  stockAdjustments ProductStockAdjustment[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -53,12 +54,29 @@ model Product {
   companyId String
   company   Company  @relation(fields: [companyId], references: [id])
 
-  offerItems OfferItem[]
+  offerItems        OfferItem[]
+  stockAdjustments  ProductStockAdjustment[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([companyId])
+}
+
+model ProductStockAdjustment {
+  id               String   @id @default(uuid())
+  productId        String
+  product          Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  previousQuantity Int
+  newQuantity      Int
+  delta            Int
+  comment          String
+  changedByUserId  String?
+  changedByUser    User?    @relation(fields: [changedByUserId], references: [id], onDelete: SetNull)
+  createdAt        DateTime @default(now())
+
+  @@index([productId, createdAt])
+  @@index([changedByUserId])
 }
 
 model Client {

@@ -38,6 +38,24 @@ export default async function DashboardPage() {
         currency: true,
         quantity: true,
         createdAt: true,
+        stockAdjustments: {
+          orderBy: { createdAt: "desc" },
+          take: 5,
+          select: {
+            id: true,
+            previousQuantity: true,
+            newQuantity: true,
+            delta: true,
+            comment: true,
+            createdAt: true,
+            changedByUser: {
+              select: {
+                name: true,
+                email: true,
+              },
+            },
+          },
+        },
       },
     }),
     db.client.findMany({

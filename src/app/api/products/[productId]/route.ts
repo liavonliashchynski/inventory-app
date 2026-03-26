@@ -13,6 +13,9 @@ const productSchema = z.object({
   price: z.coerce.number().positive(),
   currency: z.enum(["USD", "EUR", "PLN"]).default("USD"),
   quantity: z.coerce.number().int().min(0).max(1_000_000).default(0),
+  adjustmentComment: z
+    .union([z.literal(""), z.string().trim().max(500)])
+    .optional(),
 });
 
 export async function PATCH(
@@ -46,28 +49,61 @@ export async function PATCH(
         id: parsedParams.data.productId,
         companyId: session.companyId,
       },
-      select: { id: true },
+      select: {
+        id: true,
+        quantity: true,
+      },
     });
 
     if (!existingProduct) {
       return NextResponse.json({ error: "Product not found." }, { status: 404 });
     }
 
-    const updatedProduct = await db.product.update({
-      where: { id: existingProduct.id },
-      data: {
-        name: parsedBody.data.name,
-        price: parsedBody.data.price,
-        currency: parsedBody.data.currency,
-        quantity: parsedBody.data.quantity,
-      },
-      select: {
-        id: true,
-        name: true,
-        price: true,
-        currency: true,
-        quantity: true,
-      },
+    const quantityChanged = existingProduct.quantity !== parsedBody.data.quantity;
+    const normalizedComment = parsedBody.data.adjustmentComment?.trim() || null;
+
+    if (quantityChanged && !normalizedComment) {
+      return NextResponse.json(
+        {
+          error:
+            "Add a stock adjustment comment when changing the product quantity.",
+        },
+        { status: 400 },
+      );
+    }
+
+    const updatedProduct = await db.$transaction(async (tx) => {
+      const product = await tx.product.update({
+        where: { id: existingProduct.id },
+        data: {
+          name: parsedBody.data.name,
+          price: parsedBody.data.price,
+          currency: parsedBody.data.currency,
+          quantity: parsedBody.data.quantity,
+        },
+        select: {
+          id: true,
+          name: true,
+          price: true,
+          currency: true,
+          quantity: true,
+        },
+      });
+
+      if (quantityChanged && normalizedComment) {
+        await tx.productStockAdjustment.create({
+          data: {
+            productId: existingProduct.id,
+            previousQuantity: existingProduct.quantity,
+            newQuantity: parsedBody.data.quantity,
+            delta: parsedBody.data.quantity - existingProduct.quantity,
+            comment: normalizedComment,
+            changedByUserId: session.userId,
+          },
+        });
+      }
+
+      return product;
     });
 
     revalidatePath("/dashboard");

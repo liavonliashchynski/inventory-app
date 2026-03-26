@@ -199,6 +199,79 @@
   max-width: 16rem;
 }
 
+.historyBlock {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.historyTitle {
+  margin: 0;
+  color: var(--brand-text-strong);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.historyList {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.historyItem {
+  display: grid;
+  gap: 0.35rem;
+  padding: 0.75rem;
+  border: 1px solid var(--brand-border);
+  border-radius: 0.8rem;
+  background: rgba(15, 23, 42, 0.45);
+}
+
+.historyTopRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.deltaBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.15rem 0.5rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.deltaPositive {
+  background: rgba(16, 185, 129, 0.18);
+  color: #a7f3d0;
+}
+
+.deltaNegative {
+  background: rgba(248, 113, 113, 0.18);
+  color: #fecaca;
+}
+
+.historyDate {
+  color: var(--brand-muted);
+  font-size: 0.75rem;
+}
+
+.historyComment {
+  margin: 0;
+  color: var(--brand-text-strong);
+  font-size: 0.85rem;
+  line-height: 1.45;
+}
+
+.historyMeta,
+.noHistory {
+  margin: 0;
+  color: var(--brand-muted);
+  font-size: 0.75rem;
+  line-height: 1.45;
+}
+
 .editForm {
   display: grid;
   gap: 0.75rem;
@@ -223,7 +296,8 @@
   }
 
   input,
-  select {
+  select,
+  textarea {
     width: 100%;
     padding: 0.65rem 0.75rem;
     border: 1px solid var(--brand-border);
@@ -231,6 +305,7 @@
     background: rgba(15, 23, 42, 0.85);
     color: var(--brand-text-strong);
     font: inherit;
+    resize: vertical;
   }
 }
 
