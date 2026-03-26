@@ -1,4 +1,5 @@
 import s from "./productList.module.scss";
+import DeleteProductButton from "./DeleteProductButton";
 
 type Item = {
   id: string;
@@ -42,8 +43,14 @@ export default function ProductList({ products: p }: { products: Item[] }) {
             {p.map((product) => (
               <article key={product.id} className={s.mobileCard}>
                 <div className={s.mobileCardHeader}>
-                  <h3>{product.name}</h3>
-                  <span className={s.mobileCurrency}>{product.currency}</span>
+                  <div className={s.mobileCardTitle}>
+                    <h3>{product.name}</h3>
+                    <span className={s.mobileCurrency}>{product.currency}</span>
+                  </div>
+                  <DeleteProductButton
+                    productId={product.id}
+                    productName={product.name}
+                  />
                 </div>
                 <div className={s.mobileMetaGrid}>
                   <div className={s.mobileMetaBlock}>
@@ -73,6 +80,7 @@ export default function ProductList({ products: p }: { products: Item[] }) {
                     <th>Quantity</th>
                     <th>Currency</th>
                     <th>Created</th>
+                    <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -83,6 +91,12 @@ export default function ProductList({ products: p }: { products: Item[] }) {
                       <td>{x.quantity}</td>
                       <td>{x.currency}</td>
                       <td>{dateFormatter.format(new Date(x.createdAt))}</td>
+                      <td>
+                        <DeleteProductButton
+                          productId={x.id}
+                          productName={x.name}
+                        />
+                      </td>
                     </tr>
                   ))}
                 </tbody>
