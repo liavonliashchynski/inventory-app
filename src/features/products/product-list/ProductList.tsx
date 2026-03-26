@@ -1,4 +1,5 @@
 import s from "./productList.module.scss";
+import EditProductButton from "./EditProductButton";
 import DeleteProductButton from "./DeleteProductButton";
 
 type Item = {
@@ -47,10 +48,13 @@ export default function ProductList({ products: p }: { products: Item[] }) {
                     <h3>{product.name}</h3>
                     <span className={s.mobileCurrency}>{product.currency}</span>
                   </div>
-                  <DeleteProductButton
-                    productId={product.id}
-                    productName={product.name}
-                  />
+                  <div className={s.actionGroup}>
+                    <EditProductButton product={product} />
+                    <DeleteProductButton
+                      productId={product.id}
+                      productName={product.name}
+                    />
+                  </div>
                 </div>
                 <div className={s.mobileMetaGrid}>
                   <div className={s.mobileMetaBlock}>
@@ -92,10 +96,13 @@ export default function ProductList({ products: p }: { products: Item[] }) {
                       <td>{x.currency}</td>
                       <td>{dateFormatter.format(new Date(x.createdAt))}</td>
                       <td>
-                        <DeleteProductButton
-                          productId={x.id}
-                          productName={x.name}
-                        />
+                        <div className={s.actionGroup}>
+                          <EditProductButton product={x} />
+                          <DeleteProductButton
+                            productId={x.id}
+                            productName={x.name}
+                          />
+                        </div>
                       </td>
                     </tr>
                   ))}

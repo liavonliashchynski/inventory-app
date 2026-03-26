@@ -121,12 +121,19 @@
   align-items: flex-start;
 }
 
+.actionGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  align-items: flex-start;
+}
+
+.editButton,
+.saveButton,
+.cancelButton,
 .deleteButton {
   padding: 0.5rem 0.9rem;
-  border: 1px solid rgba(248, 113, 113, 0.35);
   border-radius: 9999px;
-  background: rgba(127, 29, 29, 0.18);
-  color: #fecaca;
   font: inherit;
   font-size: 0.85rem;
   font-weight: 700;
@@ -136,6 +143,40 @@
     border-color 150ms ease,
     color 150ms ease,
     transform 150ms ease;
+}
+
+.editButton,
+.saveButton {
+  border: 1px solid rgba(125, 211, 252, 0.35);
+  background: rgba(14, 116, 144, 0.18);
+  color: #bae6fd;
+}
+
+.editButton:hover:not(:disabled),
+.saveButton:hover:not(:disabled) {
+  background: rgba(8, 145, 178, 0.26);
+  border-color: rgba(186, 230, 253, 0.55);
+  color: #e0f2fe;
+  transform: translateY(-1px);
+}
+
+.cancelButton {
+  border: 1px solid var(--brand-border);
+  background: rgba(15, 23, 42, 0.55);
+  color: var(--brand-text);
+}
+
+.cancelButton:hover:not(:disabled) {
+  background: rgba(30, 41, 59, 0.7);
+  border-color: rgba(148, 163, 184, 0.45);
+  color: var(--brand-text-strong);
+  transform: translateY(-1px);
+}
+
+.deleteButton {
+  border: 1px solid rgba(248, 113, 113, 0.35);
+  background: rgba(127, 29, 29, 0.18);
+  color: #fecaca;
 }
 
 .deleteButton:hover:not(:disabled) {
@@ -156,6 +197,47 @@
   font-size: 0.75rem;
   line-height: 1.4;
   max-width: 16rem;
+}
+
+.editForm {
+  display: grid;
+  gap: 0.75rem;
+  width: min(100%, 18rem);
+  padding: 0.85rem;
+  border: 1px solid var(--brand-border);
+  border-radius: 0.9rem;
+  background: rgba(15, 23, 42, 0.6);
+}
+
+.editField {
+  display: grid;
+  gap: 0.35rem;
+  width: 100%;
+  font-size: 0.8rem;
+  color: var(--brand-muted);
+
+  span {
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+  }
+
+  input,
+  select {
+    width: 100%;
+    padding: 0.65rem 0.75rem;
+    border: 1px solid var(--brand-border);
+    border-radius: 0.75rem;
+    background: rgba(15, 23, 42, 0.85);
+    color: var(--brand-text-strong);
+    font: inherit;
+  }
+}
+
+.editActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
 }
 
 .tableWrapper {
