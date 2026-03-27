@@ -9,6 +9,7 @@ const productSchema = z.object({
   price: z.coerce.number().positive(),
   currency: z.enum(["USD", "EUR", "PLN"]).default("USD"),
   quantity: z.coerce.number().int().min(0).max(1_000_000).default(0),
+  lowStockThreshold: z.coerce.number().int().min(0).max(1_000_000).default(0),
 });
 
 export async function GET() {
@@ -64,6 +65,7 @@ export async function POST(request: Request) {
         price: parsed.data.price,
         currency: parsed.data.currency,
         quantity: parsed.data.quantity,
+        lowStockThreshold: parsed.data.lowStockThreshold,
         companyId: session.companyId,
       },
     });

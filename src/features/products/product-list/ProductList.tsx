@@ -8,6 +8,7 @@ type Item = {
   price: string;
   currency: "USD" | "EUR" | "PLN";
   quantity: number;
+  lowStockThreshold: number;
   createdAt: Date;
   stockAdjustments: {
     id: string;
@@ -42,6 +43,38 @@ const formatMoney = (price: string, currency: string) => {
 const getAdjustmentUserLabel = (name: string | null, email: string | undefined) =>
   name || email || "Unknown user";
 
+const getStockStatus = (product: Item) => {
+  if (product.lowStockThreshold > 0 && product.quantity <= product.lowStockThreshold) {
+    return {
+      label: "Low stock",
+      detail: `${product.quantity} left, alert at ${product.lowStockThreshold}`,
+      className: s.lowStockBadge,
+    };
+  }
+
+  if (product.quantity === 0) {
+    return {
+      label: "Out of stock",
+      detail: "No units available",
+      className: s.outOfStockBadge,
+    };
+  }
+
+  if (product.lowStockThreshold > 0) {
+    return {
+      label: "Tracked",
+      detail: `Alert below ${product.lowStockThreshold}`,
+      className: s.trackedBadge,
+    };
+  }
+
+  return {
+    label: "Alerts off",
+    detail: "Threshold disabled",
+    className: s.neutralBadge,
+  };
+};
+
 export default function ProductList({ products: p }: { products: Item[] }) {
   return (
     <section className={s.card}>
@@ -56,11 +89,14 @@ export default function ProductList({ products: p }: { products: Item[] }) {
       ) : (
         <>
           <div className={s.mobileList}>
-            {p.map((product) => (
-              <article key={product.id} className={s.mobileCard}>
-                <div className={s.mobileCardHeader}>
-                  <div className={s.mobileCardTitle}>
-                    <h3>{product.name}</h3>
+            {p.map((product) => {
+              const stockStatus = getStockStatus(product);
+
+              return (
+                <article key={product.id} className={s.mobileCard}>
+                  <div className={s.mobileCardHeader}>
+                    <div className={s.mobileCardTitle}>
+                      <h3>{product.name}</h3>
                     <span className={s.mobileCurrency}>{product.currency}</span>
                   </div>
                   <div className={s.actionGroup}>
@@ -71,6 +107,12 @@ export default function ProductList({ products: p }: { products: Item[] }) {
                     />
                   </div>
                 </div>
+                <div className={s.stockBanner}>
+                  <span className={`${s.stockBadge} ${stockStatus.className}`}>
+                    {stockStatus.label}
+                  </span>
+                  <span className={s.stockDetail}>{stockStatus.detail}</span>
+                </div>
                 <div className={s.mobileMetaGrid}>
                   <div className={s.mobileMetaBlock}>
                     <span className={s.metaLabel}>Price</span>
@@ -79,6 +121,10 @@ export default function ProductList({ products: p }: { products: Item[] }) {
                   <div className={s.mobileMetaBlock}>
                     <span className={s.metaLabel}>Quantity</span>
                     <strong>{product.quantity}</strong>
+                  </div>
+                  <div className={s.mobileMetaBlock}>
+                    <span className={s.metaLabel}>Alert At</span>
+                    <strong>{product.lowStockThreshold}</strong>
                   </div>
                   <div className={s.mobileMetaBlock}>
                     <span className={s.metaLabel}>Created</span>
@@ -119,8 +165,9 @@ export default function ProductList({ products: p }: { products: Item[] }) {
                 ) : (
                   <p className={s.noHistory}>No stock changes yet</p>
                 )}
-              </article>
-            ))}
+                </article>
+              );
+            })}
           </div>
 
           <div className={s.desktopTable}>
@@ -131,6 +178,7 @@ export default function ProductList({ products: p }: { products: Item[] }) {
                     <th>Name</th>
                     <th>Price</th>
                     <th>Quantity</th>
+                    <th>Alert At</th>
                     <th>Currency</th>
                     <th>Created</th>
                     <th>Stock History</th>
@@ -138,11 +186,23 @@ export default function ProductList({ products: p }: { products: Item[] }) {
                   </tr>
                 </thead>
                 <tbody>
-                  {p.map((x) => (
-                    <tr key={x.id}>
+                  {p.map((x) => {
+                    const stockStatus = getStockStatus(x);
+
+                    return (
+                      <tr key={x.id}>
                       <td>{x.name}</td>
                       <td>{formatMoney(x.price, x.currency)}</td>
-                      <td>{x.quantity}</td>
+                      <td>
+                        <div className={s.quantityCell}>
+                          <strong>{x.quantity}</strong>
+                          <span className={`${s.stockBadge} ${stockStatus.className}`}>
+                            {stockStatus.label}
+                          </span>
+                          <small className={s.stockDetail}>{stockStatus.detail}</small>
+                        </div>
+                      </td>
+                      <td>{x.lowStockThreshold}</td>
                       <td>{x.currency}</td>
                       <td>{dateFormatter.format(new Date(x.createdAt))}</td>
                       <td>
@@ -187,8 +247,9 @@ export default function ProductList({ products: p }: { products: Item[] }) {
                           />
                         </div>
                       </td>
-                    </tr>
-                  ))}
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>

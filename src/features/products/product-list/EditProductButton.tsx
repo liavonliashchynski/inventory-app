@@ -15,6 +15,7 @@ export default function EditProductButton({
     price: string;
     currency: Currency;
     quantity: number;
+    lowStockThreshold: number;
   };
 }) {
   const router = useRouter();
@@ -38,6 +39,7 @@ export default function EditProductButton({
           price: formData.get("price"),
           currency: formData.get("currency"),
           quantity: formData.get("quantity"),
+          lowStockThreshold: formData.get("lowStockThreshold"),
           adjustmentComment: formData.get("adjustmentComment"),
         }),
       });
@@ -108,6 +110,18 @@ export default function EditProductButton({
               min="0"
               step="1"
               defaultValue={product.quantity}
+              required
+            />
+          </label>
+
+          <label className={s.editField}>
+            <span>Low-stock alert at</span>
+            <input
+              name="lowStockThreshold"
+              type="number"
+              min="0"
+              step="1"
+              defaultValue={product.lowStockThreshold}
               required
             />
           </label>

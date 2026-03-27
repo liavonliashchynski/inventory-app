@@ -13,6 +13,7 @@ const productSchema = z.object({
   price: z.coerce.number().positive(),
   currency: z.enum(["USD", "EUR", "PLN"]).default("USD"),
   quantity: z.coerce.number().int().min(0).max(1_000_000).default(0),
+  lowStockThreshold: z.coerce.number().int().min(0).max(1_000_000).default(0),
   adjustmentComment: z
     .union([z.literal(""), z.string().trim().max(500)])
     .optional(),
@@ -80,6 +81,7 @@ export async function PATCH(
           price: parsedBody.data.price,
           currency: parsedBody.data.currency,
           quantity: parsedBody.data.quantity,
+          lowStockThreshold: parsedBody.data.lowStockThreshold,
         },
         select: {
           id: true,
@@ -87,6 +89,7 @@ export async function PATCH(
           price: true,
           currency: true,
           quantity: true,
+          lowStockThreshold: true,
         },
       });
 

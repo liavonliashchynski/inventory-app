@@ -102,6 +102,57 @@
   }
 }
 
+.stockBanner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.stockBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  padding: 0.25rem 0.65rem;
+  border-radius: 9999px;
+  border: 1px solid transparent;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.stockDetail {
+  color: var(--brand-muted);
+  font-size: 0.75rem;
+  line-height: 1.45;
+}
+
+.lowStockBadge {
+  background: rgba(251, 113, 133, 0.16);
+  border-color: rgba(253, 164, 175, 0.3);
+  color: #ffe4e6;
+}
+
+.outOfStockBadge {
+  background: rgba(248, 113, 113, 0.18);
+  border-color: rgba(252, 165, 165, 0.3);
+  color: #fee2e2;
+}
+
+.trackedBadge {
+  background: rgba(56, 189, 248, 0.14);
+  border-color: rgba(125, 211, 252, 0.28);
+  color: #e0f2fe;
+}
+
+.neutralBadge {
+  background: rgba(148, 163, 184, 0.14);
+  border-color: rgba(148, 163, 184, 0.28);
+  color: #e2e8f0;
+}
+
 .metaLabel {
   color: var(--brand-muted);
   font-size: 0.75rem;
@@ -270,6 +321,15 @@
   color: var(--brand-muted);
   font-size: 0.75rem;
   line-height: 1.45;
+}
+
+.quantityCell {
+  display: grid;
+  gap: 0.35rem;
+
+  strong {
+    color: var(--brand-text-strong);
+  }
 }
 
 .editForm {

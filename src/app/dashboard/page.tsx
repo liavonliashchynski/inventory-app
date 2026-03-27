@@ -37,6 +37,7 @@ export default async function DashboardPage() {
         price: true,
         currency: true,
         quantity: true,
+        lowStockThreshold: true,
         createdAt: true,
         stockAdjustments: {
           orderBy: { createdAt: "desc" },
@@ -113,6 +114,12 @@ export default async function DashboardPage() {
     ...product,
     price: product.price.toString(),
   }));
+
+  const lowStockProducts = productOptions.filter(
+    (product) =>
+      product.lowStockThreshold > 0 &&
+      product.quantity <= product.lowStockThreshold,
+  );
 
   const dashboardOffers = offers.map((offer) => ({
     ...offer,
@@ -192,7 +199,7 @@ export default async function DashboardPage() {
                 </p>
               </div>
 
-              <div className="mt-5 grid gap-4 md:grid-cols-3 xl:mt-8">
+              <div className="mt-5 grid gap-4 md:grid-cols-2 xl:mt-8 xl:grid-cols-4">
                 <div className="rounded-[1rem] border border-white/10 bg-slate-950/45 p-5">
                   <p className="text-sm font-medium text-slate-400">
                     Total Products
@@ -228,7 +235,74 @@ export default async function DashboardPage() {
                     Accepted offers ready for delivery or invoicing.
                   </p>
                 </div>
+
+                <div className="rounded-[1rem] border border-rose-300/30 bg-rose-400/10 p-5">
+                  <p className="text-sm font-medium text-rose-200">
+                    Low-Stock Alerts
+                  </p>
+                  <p className="mt-3 text-3xl font-bold tracking-tight text-rose-50">
+                    {stats.lowStockProducts}
+                  </p>
+                  <p className="mt-2 text-sm text-rose-100/80">
+                    Products at or below their alert threshold.
+                  </p>
+                </div>
               </div>
+            </section>
+
+            <section className="rounded-[1.2rem] border border-rose-300/20 bg-rose-400/10 p-4 shadow-[0_18px_40px_rgba(2,6,23,0.28)] backdrop-blur sm:p-5 xl:col-span-2">
+              <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-rose-200/80">
+                    Inventory alerts
+                  </p>
+                  <h2 className="mt-2 text-2xl font-semibold tracking-tight text-white">
+                    Low-stock watchlist
+                  </h2>
+                </div>
+                <p className="max-w-xl text-sm leading-6 text-rose-100/80">
+                  Thresholds are configured per product. Set a threshold of 0 to keep alerts off for that item.
+                </p>
+              </div>
+
+              {lowStockProducts.length ? (
+                <div className="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+                  {lowStockProducts.map((product) => (
+                    <article
+                      key={product.id}
+                      className="rounded-[1rem] border border-rose-200/20 bg-slate-950/35 p-4"
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <div>
+                          <h3 className="text-base font-semibold text-white">
+                            {product.name}
+                          </h3>
+                          <p className="mt-1 text-sm text-slate-300">
+                            {product.currency} catalog item
+                          </p>
+                        </div>
+                        <span className="rounded-full border border-rose-200/20 bg-rose-500/15 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-rose-100">
+                          Alert
+                        </span>
+                      </div>
+                      <p className="mt-4 text-sm text-slate-200">
+                        <span className="font-semibold text-white">{product.quantity}</span>{" "}
+                        left in stock, threshold{" "}
+                        <span className="font-semibold text-white">
+                          {product.lowStockThreshold}
+                        </span>
+                        .
+                      </p>
+                    </article>
+                  ))}
+                </div>
+              ) : (
+                <div className="mt-5 rounded-[1rem] border border-white/10 bg-slate-950/35 p-5">
+                  <p className="text-sm text-slate-200">
+                    No products are currently below their low-stock threshold.
+                  </p>
+                </div>
+              )}
             </section>
 
             <CollapsibleDashboardSection
