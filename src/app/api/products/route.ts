@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { getSessionUser } from "@/lib/auth";
+import { csvHeaders } from "@/lib/product-csv";
 
 const productSchema = z.object({
   name: z.string().trim().min(2).max(120),
@@ -12,7 +13,7 @@ const productSchema = z.object({
   lowStockThreshold: z.coerce.number().int().min(0).max(1_000_000).default(0),
 });
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
     const session = await getSessionUser();
 
@@ -23,12 +24,34 @@ export async function GET() {
       );
     }
 
+    const format = new URL(request.url).searchParams.get("format");
+
     const products = await db.product.findMany({
       where: { companyId: session.companyId },
       orderBy: { createdAt: "desc" },
     });
 
-    return NextResponse.json(products, { status: 200 });
+    if (format === "csv") {
+      const { buildProductsCsv } = await import("@/lib/product-csv");
+      const csv = buildProductsCsv(products);
+
+      return new NextResponse(csv, {
+        status: 200,
+        headers: {
+          "Content-Type": "text/csv; charset=utf-8",
+          "Content-Disposition": 'attachment; filename="products.csv"',
+          "Cache-Control": "no-store",
+        },
+      });
+    }
+
+    return NextResponse.json(
+      {
+        products,
+        csvTemplateHeaders: csvHeaders,
+      },
+      { status: 200 },
+    );
   } catch (error) {
     console.error("GET_PRODUCTS_ERROR:", error);
     return NextResponse.json(

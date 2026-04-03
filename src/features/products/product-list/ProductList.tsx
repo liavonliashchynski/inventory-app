@@ -1,6 +1,7 @@
 import s from "./productList.module.scss";
 import EditProductButton from "./EditProductButton";
 import DeleteProductButton from "./DeleteProductButton";
+import ProductCsvActions from "./ProductCsvActions";
 
 type Item = {
   id: string;
@@ -79,8 +80,13 @@ export default function ProductList({ products: p }: { products: Item[] }) {
   return (
     <section className={s.card}>
       <div className={s.header}>
-        <h2>Your products</h2>
-        <p>{p.length} items in your inventory.</p>
+        <div>
+          <h2>Your products</h2>
+          <p>{p.length} items in your inventory.</p>
+        </div>
+      </div>
+      <div className={s.toolbar}>
+        <ProductCsvActions />
       </div>
       {!p.length ? (
         <div className={s.emptyState}>
