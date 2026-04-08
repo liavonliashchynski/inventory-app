@@ -58,6 +58,27 @@
   gap: 1rem;
 }
 
+.csvTools {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.csvActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.csvHint {
+  margin: 0;
+  color: var(--brand-muted);
+  font-size: 0.8125rem;
+}
+
+.hiddenInput {
+  display: none;
+}
+
 .field {
   display: flex;
   flex-direction: column;

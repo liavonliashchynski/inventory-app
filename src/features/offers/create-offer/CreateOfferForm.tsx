@@ -3,6 +3,7 @@
 import { useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import styles from "./createOfferForm.module.scss";
+import ClientCsvActions from "./ClientCsvActions";
 
 type Currency = "USD" | "EUR" | "PLN";
 
@@ -210,6 +211,8 @@ export default function CreateOfferForm({
             <h3>Recipient</h3>
             <p>Use an existing client or add a new company inline.</p>
           </div>
+
+          <ClientCsvActions />
 
           <div className={styles.clientGrid}>
             <div className={styles.field}>
