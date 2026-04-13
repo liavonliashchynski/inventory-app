@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { db } from "@/lib/db";
 import { getSessionUser } from "@/lib/auth";
+import { buildOffersCsv, offerCsvHeaders } from "@/lib/offer-csv";
 
 const offerItemSchema = z.object({
   productId: z.string().uuid(),
@@ -50,6 +51,71 @@ const parseValidUntil = (value?: string) => {
   const parsed = new Date(`${normalized}T00:00:00.000Z`);
   return Number.isNaN(parsed.getTime()) ? "invalid" : parsed;
 };
+
+export async function GET(request: Request) {
+  try {
+    const session = await getSessionUser();
+
+    if (!session) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const format = new URL(request.url).searchParams.get("format");
+
+    const offers = await db.offer.findMany({
+      where: { companyId: session.companyId },
+      orderBy: { createdAt: "desc" },
+      select: {
+        id: true,
+        offerNumber: true,
+        clientName: true,
+        clientEmail: true,
+        validUntil: true,
+        notes: true,
+        client: {
+          select: {
+            phone: true,
+          },
+        },
+        items: {
+          orderBy: { createdAt: "asc" },
+          select: {
+            productName: true,
+            quantity: true,
+          },
+        },
+      },
+    });
+
+    if (format === "csv") {
+      const csv = buildOffersCsv(offers);
+
+      return new NextResponse(csv, {
+        status: 200,
+        headers: {
+          "Content-Type": "text/csv; charset=utf-8",
+          "Content-Disposition": 'attachment; filename="offers.csv"',
+          "Cache-Control": "no-store",
+        },
+      });
+    }
+
+    return NextResponse.json(
+      {
+        offers,
+        csvTemplateHeaders: offerCsvHeaders,
+      },
+      { status: 200 },
+    );
+  } catch (error) {
+    console.error("GET_OFFERS_ERROR:", error);
+
+    return NextResponse.json(
+      { error: "Failed to fetch offers" },
+      { status: 500 },
+    );
+  }
+}
 
 export async function POST(request: Request) {
   try {

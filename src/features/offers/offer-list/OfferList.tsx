@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import s from "./offerList.module.scss";
 import SendOfferButton from "./SendOfferButton";
+import OfferCsvActions from "./OfferCsvActions";
 
 type OfferItem = {
   id: string;
@@ -135,6 +136,8 @@ export default function OfferList({ offers }: { offers: Offer[] }) {
         <h2>Recent offers</h2>
         <p>{offers.length} saved offers ready for review, sending, or follow-up.</p>
       </div>
+
+      <OfferCsvActions />
 
       <div className={s.statusOverview}>
         <button
